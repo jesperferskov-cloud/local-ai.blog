@@ -1,0 +1,242 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #161E1D;
+    color: #F1F5F4;
+    margin: 0;
+    padding: 0;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+  }
+}
+
+/* Hide scrollbar for category pills while allowing smooth touch scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 3D Perspective Utility for Hardware-Accelerated Micro-Tilt */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+/* Zen Terminal Command-Line Cursor & Shake Animation */
+@keyframes cursor-blink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+.animate-cursor-blink {
+  animation: cursor-blink 1s cubic-bezier(1, 0, 0, 1) infinite;
+}
+
+@keyframes terminal-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-5px);
+  }
+  40%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+.animate-shake {
+  animation: terminal-shake 0.35s ease-in-out;
+}
+
+/* Apple Silicon Neural Core Organic Breathing Animation */
+@keyframes neural-breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.88;
+    filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.45));
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 1;
+    filter: drop-shadow(0 0 18px rgba(16, 185, 129, 0.8));
+  }
+}
+
+@keyframes neural-pulse-ring {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.7;
+  }
+  60% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1.28);
+    opacity: 0;
+  }
+}
+
+.animate-neural-breathe {
+  animation: neural-breathe 4s ease-in-out infinite;
+  transform-origin: 250px 250px;
+}
+
+.animate-neural-ring {
+  animation: neural-pulse-ring 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+  transform-origin: 250px 250px;
+}
+
+/* Josh Comeau Inspired: Organic Silicon Yogi Animations */
+@keyframes float-yogi {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(0.4deg);
+  }
+}
+
+@keyframes shadow-breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(0.92);
+    opacity: 0.35;
+  }
+}
+
+@keyframes zen-breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.88;
+    filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.65));
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+    filter: drop-shadow(0 0 22px rgba(16, 185, 129, 1));
+  }
+}
+
+@keyframes zen-ripple {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.85;
+  }
+  70% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1.28);
+    opacity: 0;
+  }
+}
+
+@keyframes data-dash-flow {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -120;
+  }
+}
+
+@keyframes stardust-twinkle {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.8) translateY(0);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.25) translateY(-3px);
+  }
+}
+
+.animate-float-yogi {
+  animation: float-yogi 5s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+.animate-shadow-breathe {
+  animation: shadow-breathe 5s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+.animate-zen-breathe {
+  animation: zen-breathe 3.6s ease-in-out infinite;
+  transform-origin: 270px 335px;
+}
+
+.animate-zen-ripple-slow {
+  animation: zen-ripple 4s cubic-bezier(0.15, 0.85, 0.35, 1) infinite;
+  transform-origin: 270px 335px;
+}
+
+.animate-zen-ripple-fast {
+  animation: zen-ripple 4s cubic-bezier(0.15, 0.85, 0.35, 1) infinite 2s;
+  transform-origin: 270px 335px;
+}
+
+.animate-data-dash {
+  animation: data-dash-flow 18s linear infinite;
+}
+
+.animate-stardust {
+  animation: stardust-twinkle 3s ease-in-out infinite;
+}
+
+/* The Eclipse Aura Ambient Background Halo Pulse */
+@keyframes aura-pulse {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+.animate-aura-pulse {
+  animation: aura-pulse 10s ease-in-out infinite;
+  transform-origin: 50% 30%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-yogi,
+  .animate-shadow-breathe,
+  .animate-zen-breathe,
+  .animate-zen-ripple-slow,
+  .animate-zen-ripple-fast,
+  .animate-data-dash,
+  .animate-stardust,
+  .animate-aura-pulse {
+    animation: none !important;
+  }
+}

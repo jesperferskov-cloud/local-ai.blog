@@ -1,0 +1,260 @@
+[
+  {
+    "id": "draft-deepseek-llama",
+    "title": "Kør DeepSeek R1 og Llama 3.3 lokalt på Apple Silicon uden internet",
+    "slug": "koer-deepseek-r1-og-llama-33-lokalt-apple-silicon",
+    "status": "draft",
+    "category": "mac",
+    "hardwareArch": "apple-m",
+    "hardwareLabel": "M3 Max / M4 Pro",
+    "tags": [
+      "Apple Silicon",
+      "DeepSeek R1",
+      "Llama 3.3",
+      "Ollama",
+      "Metal",
+      "Privatliv"
+    ],
+    "primaryTag": "Apple Silicon",
+    "coverImage": "",
+    "metrics": {
+      "primaryValue": "48.2 tok/s",
+      "primaryLabel": "Inferenshastighed",
+      "secondaryValue": "41.8 GB / 120 GB",
+      "secondaryLabel": "RAM Allokering"
+    },
+    "markdown": "# Kør DeepSeek R1 og Llama 3.3 lokalt på Apple Silicon uden internet\n\nMed lanceringen af **DeepSeek R1** og **Llama 3.3 70B** er lokal AI på forbrugerhardware blevet en praktisk virkelighed for udviklere, forskere og organisationer, der kræver absolut databeskyttelse.\n\nTraditionelle cloud-tjenester koster hundredvis af dollars om måneden og sender dine følsomme forespørgsler, kodebaser og dokumenter til eksterne datacentre. På Apple Silicon udnytter vi den delte **Unified Memory Architecture (UMA)**, hvor CPU og Metal GPU deler op mod 128 GB eller 192 GB RAM ved op til 800 GB/s.\n\n---\n\n## 1. Systemkrav og Hardwareallokering\n\nFor at afvikle en 70B parameter-model med 4-bit kvantisering (*Q4_K_M*) skal maskinen have:\n\n- **Mac med Apple Silicon** (M2 Max, M3 Max eller M4 Pro/Max)\n- **Minimum 48 GB Unified Memory** (for 32B modeller) eller **64-128 GB** (for 70B modeller)\n- **macOS Sonoma 14.5+** eller **macOS Sequoia 15.2+**\n- **100 GB ledig SSD-plads** til modelvægte og KV-cache\n\n### Forøg Metal GPU Hukommelsesgrænsen\n\nSom standard reserverer macOS op til 75% af den samlede RAM til grafikpipelinen. Kør følgende kommando i terminalen for at tillade op til 90% allokering:\n\n```bash\nsudo sysctl iogpu.wired_mem_limit=102400\n```\n\n---\n\n## 2. Installation med Ollama\n\nOllama er den hurtigste måde at administrere og afvikle GGUF-kvantiserede modeller på:\n\n```bash\n# Installer Ollama via Homebrew\nbrew install ollama\n\n# Start baggrundsserveren\nollama serve\n\n# Hent og kør DeepSeek R1 14B Q8\nollama run deepseek-r1:14b-q8_0\n```\n\n---\n\n## 3. Ydelsesmålinger (Benchmarks)\n\n| Model variant | Kvantisering | VRAM Forbrug | Tokens / sek (M3 Max) | TTFT |\n|---|---|---|---|---|\n| DeepSeek R1 14B | Q8_0 | 16.2 GB | **38.4 tok/s** | 140 ms |\n| DeepSeek R1 32B | Q4_K_M | 20.8 GB | **19.2 tok/s** | 210 ms |\n| Llama 3.3 70B | Q4_K_M | 41.8 GB | **48.2 tok/s** | 182 ms |\n| Qwen 2.5 Coder 32B | Q4_K_M | 21.0 GB | **22.5 tok/s** | 165 ms |\n\n> **Konklusion**: Ved at anvende 4-bit kvantisering opnår vi 99% af FP16-ræsonnementsevnen med 65% mindre hukommelsesforbrug. Nul data forlader din computer.",
+    "updatedAt": "2026-10-03T20:28:33.542Z",
+    "wordCount": 382,
+    "readTime": "4 min",
+    "filePath": "content/posts/koer-deepseek-r1-og-llama-33-lokalt-apple-silicon.md"
+  },
+  {
+    "id": "art-6",
+    "title": "Whisper Large-v3 Turbo på iPad Pro M4: Offline Tale-til-Tekst på Dansk",
+    "slug": "whisper-large-v3-turbo-ipad-pro-dansk",
+    "status": "published",
+    "category": "iphone",
+    "hardwareArch": "npu",
+    "hardwareLabel": "iPad Pro M4 · 38 TOPS NPU",
+    "tags": [
+      "iPhone AI",
+      "iOS",
+      "Whisper",
+      "Audio"
+    ],
+    "primaryTag": "iOS",
+    "coverImage": "",
+    "metrics": {
+      "primaryValue": "12.8x RT",
+      "primaryLabel": "Realtids Transskribering",
+      "secondaryValue": "1.4% WER",
+      "secondaryLabel": "Ordfremskrivningsfejl"
+    },
+    "markdown": "# Whisper Large-v3 Turbo på iPad Pro M4: Offline Tale-til-Tekst på Dansk\n\nTransskriber interviews, møder og optagelser lokalt på farten med 12x realtidshastighed og under 2% fejlrate på dansk tale.",
+    "updatedAt": "2025-03-05T08:30:00.000Z",
+    "wordCount": 420,
+    "readTime": "4 min",
+    "filePath": "content/posts/whisper-large-v3-turbo-ipad-pro-dansk.md"
+  },
+  {
+    "id": "art-5",
+    "title": "Lokal Copilot i VS Code med Qwen 2.5 Coder 32B: 100% Privat Kodebase",
+    "slug": "lokal-copilot-qwen-25-coder-vs-code",
+    "status": "published",
+    "category": "mac",
+    "hardwareArch": "apple-m",
+    "hardwareLabel": "Apple Silicon M2 / M3 / M4",
+    "tags": [
+      "Mac Setup",
+      "Developer",
+      "VS Code",
+      "Qwen 2.5"
+    ],
+    "primaryTag": "Mac Setup",
+    "coverImage": "",
+    "metrics": {
+      "primaryValue": "54.1 tok/s",
+      "primaryLabel": "Kode-fuldførelse Hastighed",
+      "secondaryValue": "0 KB",
+      "secondaryLabel": "Ekstern Datatrafik"
+    },
+    "markdown": "# Lokal Copilot i VS Code med Qwen 2.5 Coder 32B: 100% Privat Kodebase\n\nGuide til at konfigurere Continue.dev med lokal Ollama inferens, så din kildekode og hemmeligheder aldrig forlader dit lokale drev.",
+    "updatedAt": "2025-03-02T11:00:00.000Z",
+    "wordCount": 480,
+    "readTime": "6 min",
+    "filePath": "content/posts/lokal-copilot-qwen-25-coder-vs-code.md"
+  },
+  {
+    "id": "featured-1-en",
+    "title": "Unleash the Power of Local AI: Your Guide to On-Device AI on Apple Devices",
+    "slug": "frigoer-kraften-i-lokal-ai-apple-enheder",
+    "status": "published",
+    "category": "mac",
+    "hardwareArch": "apple-m",
+    "hardwareLabel": "Apple Silicon M3 / M4",
+    "tags": [
+      "Apple Silicon",
+      "Unified Memory",
+      "Metal GPU",
+      "Ollama",
+      "MLX"
+    ],
+    "primaryTag": "Apple Silicon",
+    "coverImage": "",
+    "metrics": {
+      "primaryValue": "48.2 tok/s",
+      "primaryLabel": "Avg. Inference Speed",
+      "secondaryValue": "41.8 GB / 120 GB",
+      "secondaryLabel": "RAM Allocation"
+    },
+    "markdown": "# Unleash the Power of Local AI: Your Guide to On-Device AI on Apple Devices\n\nApple's **Unified Memory Architecture (UMA)** has revolutionized on-device AI. Instead of separate VRAM pools typical of discrete GPUs, the CPU and Metal GPU share memory bandwidth exceeding 800 GB/s across up to 128GB or 192GB pools. This makes running massive models like Llama 3.3 70B, DeepSeek V3/R1, and Qwen 2.5 completely feasible right on your desktop.\n\n---\n\n## 1. Why Unified Memory Changes Everything\n\nTraditional consumer setups require specialized GPUs like NVIDIA's RTX 4090 with 24 GB VRAM or expensive enterprise accelerators like the H100. When a 70B parameter model in 4-bit quantization consumes 40+ GB, a standard desktop fails without painfully slow CPU system RAM offloading.\n\nOn an Apple Silicon Mac equipped with M3 Max or M4 Max, the entire unified memory pool is accessible to the Metal compute shaders. A 128GB Mac can dedicate 96-105 GB straight to Metal GPU computations via a simple sysctl tuning flag:\n\n```bash\nsudo sysctl iogpu.wired_mem_limit=102400\n```\n\n---\n\n## 2. The Optimal Software Stack: Ollama and MLX\n\nFor everyday development and instant plug-and-play workflows, Ollama remains the most intuitive runtime:\n\n```bash\nbrew install ollama\nollama run llama3.3:70b-instruct-q4_K_M\n```\n\nFor absolute hardware saturation, Apple's native MLX framework is unmatched. Designed from the ground up for Swift and Python, MLX taps into the Apple Neural Engine (ANE) and Metal Performance Shaders to achieve 15-20% higher token throughput compared to generic CUDA translation layers.\n\n---\n\n## 3. Quantization: The Sweet Spot Between Precision and Speed\n\n| Specification | FP16 Weights | Q4_K_M (Recommended) |\n|---|---|---|\n| Model Footprint | 141.2 GB | **41.8 GB** |\n| M3 Max Tok/s | 14.1 tok/s | **48.2 tok/s** |\n| TTFT Latency | 420 ms | **180 ms** |\n| Required RAM | > 160 GB | **64-128 GB** |",
+    "updatedAt": "2025-03-01T10:00:00.000Z",
+    "wordCount": 820,
+    "readTime": "6 min",
+    "filePath": "content/posts/frigoer-kraften-i-lokal-ai-apple-enheder.en.md"
+  },
+  {
+    "id": "featured-1",
+    "title": "Frigør Kraften i Lokal AI: Din Guide til On-Device AI på Apple-Enheder",
+    "slug": "frigoer-kraften-i-lokal-ai-apple-enheder",
+    "status": "published",
+    "category": "mac",
+    "hardwareArch": "apple-m",
+    "hardwareLabel": "Apple Silicon M3 / M4",
+    "tags": [
+      "Apple Silicon",
+      "Unified Memory",
+      "Metal GPU",
+      "Ollama",
+      "MLX"
+    ],
+    "primaryTag": "Apple Silicon",
+    "coverImage": "",
+    "metrics": {
+      "primaryValue": "48.2 tok/s",
+      "primaryLabel": "Gns. Inferenshastighed",
+      "secondaryValue": "41.8 GB / 120 GB",
+      "secondaryLabel": "RAM Allokering"
+    },
+    "markdown": "# Frigør Kraften i Lokal AI: Din Guide til On-Device AI på Apple-Enheder\n\nApples **Unified Memory Architecture (UMA)** har revolutioneret on-device AI. I stedet for separate VRAM-buffere som på traditionelle GPU’er, deler CPU og Metal GPU op til 128GB eller 192GB båndbredde med op til 800 GB/s. Dette gør det muligt at køre modeller som Llama 3.3 70B, DeepSeek V3/R1 og Qwen 2.5 helt lokalt på dit skrivebord.\n\n---\n\n## 1. Hvorfor Unified Memory er en game-changer\n\nTraditionelle PC-opsætninger kræver specialiserede GPU’er som NVIDIA RTX 4090 med 24 GB VRAM eller dyr server-hardware som H100 til store modeller. Når en 70B model i 4-bit kvantisering fylder 40+ GB, kan en forbruger-PC simpelthen ikke have den i grafikkortets hukommelse uden ekstremt langsom RAM-offloading.\n\nPå en Mac med M3 Max eller M4 Max har hele maskinen adgang til den samlede hukommelse. En 128GB Mac kan afsætte 96-105 GB direkte til Metal GPU-computations via et simpelt sysctl-flag:\n\n```bash\nsudo sysctl iogpu.wired_mem_limit=102400\n```\n\n---\n\n## 2. Den ideelle software-stak: Ollama og MLX\n\nFor hverdagsbrugere er Ollama den mest intuitive platform:\n\n```bash\nbrew install ollama\nollama run llama3.3:70b-instruct-q4_K_M\n```\n\nFor maksimal udnyttelse af Apples hardware er Apples eget MLX-framework uovertruffet. MLX er bygget fra bunden til Swift og Python og udnytter Apples Neural Engine (ANE) og Metal Performance Shaders til at opnå op mod 15-20% højere token-rate.\n\n---\n\n## 3. Kvantisering: Sweet spot mellem præcision og hastighed\n\n| Specifikation | FP16 Vægte | Q4_K_M (Anbefalet) |\n|---|---|---|\n| Model Størrelse | 141.2 GB | **41.8 GB** |\n| M3 Max Tok/s | 14.1 tok/s | **48.2 tok/s** |\n| TTFT Latens | 420 ms | **180 ms** |\n| Nødvendig RAM | > 160 GB | **64-128 GB** |",
+    "updatedAt": "2025-03-01T10:00:00.000Z",
+    "wordCount": 820,
+    "readTime": "8 min",
+    "filePath": "content/posts/frigoer-kraften-i-lokal-ai-apple-enheder.md"
+  },
+  {
+    "id": "art-1",
+    "title": "DeepSeek R1 på M4 Pro: 32B vs 14B Kvantisering & Tokens/sekund",
+    "slug": "deepseek-r1-m4-pro-quantization-benchmark",
+    "status": "published",
+    "category": "benchmarks",
+    "hardwareArch": "apple-m",
+    "hardwareLabel": "M4 Pro · 48GB RAM",
+    "tags": [
+      "DeepSeek",
+      "M4 Pro",
+      "Kvantisering",
+      "Benchmarks"
+    ],
+    "primaryTag": "Benchmarks",
+    "coverImage": "",
+    "metrics": {
+      "primaryValue": "38.4 tok/s",
+      "primaryLabel": "14B Q8 Hastighed",
+      "secondaryValue": "19.2 tok/s",
+      "secondaryLabel": "32B Q4 Hastighed"
+    },
+    "markdown": "# DeepSeek R1 på M4 Pro: 32B vs 14B Kvantisering & Tokens/sekund\n\nDeepSeek R1 har sat nye standarder for matematiske og logiske ræsonnementer. På en MacBook Pro med M4 Pro og 48 GB Unified Memory testede vi både 14B og 32B varianterne i Ollama og llama.cpp.\n\n---\n\n## 1. Ydeevne og Hukommelsesforbrug\n\n14B-modellen med Q8_0 kvantisering kørte med imponerende 38.4 tokens i sekundet, hvilket gør den hurtigere end menneskelig læsehastighed og velegnet til interaktivt arbejde.\n\n32B-modellen med Q4_K_M rammer 19.2 tokens i sekundet med et hukommelsesforbrug på ca. 20.8 GB, hvilket efterlader masser af plads til Xcode, Docker og browser.\n\n```bash\nollama run deepseek-r1:14b-q8_0\n```",
+    "updatedAt": "2025-02-24T14:30:00.000Z",
+    "wordCount": 540,
+    "readTime": "6 min",
+    "filePath": "content/posts/deepseek-r1-m4-pro-quantization-benchmark.md"
+  },
+  {
+    "id": "art-2",
+    "title": "CoreML Vision & YOLOv11 på iPhone 16 Pro: 60 FPS Realtids-inferens",
+    "slug": "coreml-vision-yolov11-iphone-16-pro",
+    "status": "published",
+    "category": "iphone",
+    "hardwareArch": "iphone-a",
+    "hardwareLabel": "A18 Pro · 16-Core ANE",
+    "tags": [
+      "iPhone 16 Pro",
+      "CoreML",
+      "YOLOv11",
+      "Vision",
+      "iPhone AI",
+      "iOS"
+    ],
+    "primaryTag": "iPhone AI",
+    "coverImage": "",
+    "metrics": {
+      "primaryValue": "8.4 ms",
+      "primaryLabel": "ANE Latens pr. Billede",
+      "secondaryValue": "1.6 W",
+      "secondaryLabel": "Strømforbrug"
+    },
+    "markdown": "# CoreML Vision & YOLOv11 på iPhone 16 Pro: 60 FPS Realtids-inferens\n\nMed A18 Pro og CoreML Tools 8.0 kan man køre avancerede objektdetektionsmodeller direkte i kamerastreamen på iOS uden at dræne batteriet eller overophede enheden.\n\n---\n\n## 1. Kvantisering til MIL (Model Intermediate Language)\n\nVed at konvertere PyTorch-vægtene via CoreML Tools med INT8 per-channel kvantisering opnås 100% kørsel på Neural Engine i stedet for den batterikrævende GPU:\n\n```bash\npython -m coremltools.converters.mil.convert yolov11n.pt --target ios18\n```",
+    "updatedAt": "2025-02-18T09:15:00.000Z",
+    "wordCount": 460,
+    "readTime": "5 min",
+    "filePath": "content/posts/coreml-vision-yolov11-iphone-16-pro.md"
+  },
+  {
+    "id": "art-3",
+    "title": "Mac Studio Klynge: Distribueret LLM Kørsel over Thunderbolt 5",
+    "slug": "mac-studio-cluster-thunderbolt-5",
+    "status": "published",
+    "category": "hybrid",
+    "hardwareArch": "hybrid",
+    "hardwareLabel": "2x M2 Ultra · 384GB UMA",
+    "tags": [
+      "Hybrid Apps",
+      "Systemdesign",
+      "Mac Studio",
+      "Thunderbolt 5"
+    ],
+    "primaryTag": "Hybrid Apps",
+    "coverImage": "",
+    "metrics": {
+      "primaryValue": "12.4 tok/s",
+      "primaryLabel": "405B Model Hastighed",
+      "secondaryValue": "80 Gbps",
+      "secondaryLabel": "Interconnect Båndbredde"
+    },
+    "markdown": "# Mac Studio Klynge: Distribueret LLM Kørsel over Thunderbolt 5\n\nHvorfor bruge 250.000 kr. på en enkelt server, når to Mac Studios med M2 Ultra kan forbindes i en tensor-parallel eller pipeline-parallel klynge via Exo eller llama.cpp RPC?\n\n---\n\n## 1. Opsætning med Exo Distributed Inference\n\nExo opdager automatisk enheder på det lokale netværk og fordeler lagene i modellen proportionalt med maskinernes ledige hukommelse.\n\n```bash\npip install exo && exo run llama-3.3-70b --node-type worker\n```",
+    "updatedAt": "2025-01-20T10:00:00.000Z",
+    "wordCount": 490,
+    "readTime": "10 min",
+    "filePath": "content/posts/mac-studio-cluster-thunderbolt-5.md"
+  },
+  {
+    "id": "art-4",
+    "title": "MLX vs. Ollama vs. llama.cpp: Hvilken Runtime Yder Mest på Apple Silicon?",
+    "slug": "mlx-vs-ollama-llama-cpp-sammenligning",
+    "status": "published",
+    "category": "mac",
+    "hardwareArch": "apple-m",
+    "hardwareLabel": "M3 Pro / M3 Max",
+    "tags": [
+      "Mac Setup",
+      "Benchmarks",
+      "MLX",
+      "Ollama"
+    ],
+    "primaryTag": "Mac Setup",
+    "coverImage": "",
+    "metrics": {
+      "primaryValue": "+22% tok/s",
+      "primaryLabel": "MLX fordel v. Lange Prompts",
+      "secondaryValue": "140 ms",
+      "secondaryLabel": "Ollama TTFT forsinkelse"
+    },
+    "markdown": "# MLX vs. Ollama vs. llama.cpp: Hvilken Runtime Yder Mest på Apple Silicon?\n\nEn grundig sammenligning af Time to First Token (TTFT), vedvarende token-hastighed, hukommelses-overhead og udvikleroplevelse.",
+    "updatedAt": "2025-01-15T12:00:00.000Z",
+    "wordCount": 520,
+    "readTime": "7 min",
+    "filePath": "content/posts/mlx-vs-ollama-llama-cpp-sammenligning.md"
+  }
+]

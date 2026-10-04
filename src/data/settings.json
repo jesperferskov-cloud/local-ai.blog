@@ -1,0 +1,27 @@
+{
+  "blogName": "local-ai.blog",
+  "heroTitle": "Mine Erfaringer med Lokal AI på Apple Silicon",
+  "heroSubtitle": "Personlige eksperimenter, prompts og ufiltrerede tests af åbne modeller direkte på hverdagens hardware.",
+  "disclaimerText": "Entusiast-deklaration: Jeg er ikke certificeret it-ekspert, men en nysgerrig AI-entusiast. Her deler jeg personlige observationer, brugbare prompts og rå tests af modeller som Gemma 2-9B på Macs med M4-chips.",
+  "authorName": "Jesper",
+  "authorRole": "Selvlært AI Entusiast",
+  "eyebrowText": "UDVALGT ARTIKEL • 6 MIN LÆSETID",
+  "tags": [
+    "Apple Silicon",
+    "CoreML",
+    "Gemma 2-9B",
+    "Privatliv",
+    "Ollama"
+  ],
+  "translations": {
+    "en": {
+      "blogName": "local-ai.blog",
+      "heroTitle": "My Experiences with Local AI on Apple Silicon",
+      "heroSubtitle": "Personal experiments, prompts, and unvarnished tests of open models directly on everyday hardware.",
+      "disclaimerText": "Enthusiast declaration: I am not a certified IT specialist, but an avid AI enthusiast. Here I share personal observations, practical prompts, and raw tests of models like Gemma 2-9B on Macs with M4 silicon.",
+      "authorName": "Jesper",
+      "authorRole": "Self-taught AI Enthusiast",
+      "eyebrowText": "FEATURED EDITORIAL • 6 MIN READ"
+    }
+  }
+}

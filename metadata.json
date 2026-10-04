@@ -1,0 +1,7 @@
+{
+  "name": "local-ai.blog",
+  "description": "Din tekniske guide til lokal inferens, on-device AI, Apple Silicon benchmarks og hybride modeller.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
