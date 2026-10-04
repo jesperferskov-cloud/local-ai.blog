@@ -69,7 +69,13 @@ export async function compileStaticContent(): Promise<ParsedMarkdownPost[]> {
         id: data.id || (isEnglish ? `${baseSlug}-en` : baseSlug),
         title: data.title || baseSlug.replace(/-/g, ' '),
         slug: data.slug || baseSlug,
-        date: data.date || (data.updatedAt ? data.updatedAt.slice(0, 10) : new Date().toISOString().slice(0, 10)),
+        date: data.date
+          ? (typeof data.date === 'string'
+              ? data.date
+              : data.date instanceof Date
+              ? data.date.toISOString().slice(0, 16)
+              : String(data.date))
+          : (data.updatedAt ? data.updatedAt.slice(0, 16) : new Date().toISOString().slice(0, 16)),
         readingTime: data.readingTime || data.readTime || `${readMinutes} min`,
         hardware: data.hardware ? (Array.isArray(data.hardware) ? data.hardware.join(' • ') : data.hardware) : (data.hardwareLabel || 'Apple Silicon'),
         updated: data.updated || undefined,

@@ -15,6 +15,7 @@ import { ArticleModal } from './components/ArticleModal';
 import { AboutModal } from './components/AboutModal';
 import { AdminPanel } from './components/admin/AdminPanel';
 import { AdminLockScreen } from './components/admin/AdminLockScreen';
+import { Unsubscribe } from './pages/Unsubscribe.jsx';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { SiteSettingsProvider } from './context/SiteSettingsContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -33,13 +34,16 @@ function BlogApp() {
     return hasValidAdminSession();
   });
 
-  // Router state: checks if user is on /admin or #admin
-  const [currentRoute, setCurrentRoute] = useState<'blog' | 'admin'>(() => {
+  // Router state: checks if user is on /admin, /unsubscribe or #admin, #unsubscribe
+  const [currentRoute, setCurrentRoute] = useState<'blog' | 'admin' | 'unsubscribe'>(() => {
     if (typeof window !== 'undefined') {
       const path = window.location.pathname;
       const hash = window.location.hash;
       if (path === '/admin' || hash === '#admin') {
         return 'admin';
+      }
+      if (path === '/unsubscribe' || path.startsWith('/unsubscribe') || hash === '#unsubscribe' || hash.startsWith('#unsubscribe')) {
+        return 'unsubscribe';
       }
     }
     return 'blog';
@@ -74,6 +78,8 @@ function BlogApp() {
       const hash = window.location.hash;
       if (path === '/admin' || hash === '#admin') {
         setCurrentRoute('admin');
+      } else if (path === '/unsubscribe' || path.startsWith('/unsubscribe') || hash === '#unsubscribe' || hash.startsWith('#unsubscribe')) {
+        setCurrentRoute('unsubscribe');
       } else {
         setCurrentRoute('blog');
       }
@@ -93,9 +99,11 @@ function BlogApp() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  const navigateTo = (route: 'blog' | 'admin') => {
+  const navigateTo = (route: 'blog' | 'admin' | 'unsubscribe') => {
     setCurrentRoute(route);
-    const targetUrl = route === 'admin' ? '/admin' : '/';
+    let targetUrl = '/';
+    if (route === 'admin') targetUrl = '/admin';
+    if (route === 'unsubscribe') targetUrl = '/unsubscribe';
     if (window.location.pathname !== targetUrl) {
       window.history.pushState(null, '', targetUrl);
     }
@@ -113,6 +121,11 @@ function BlogApp() {
     clearAdminSession();
     setIsAdminAuthenticated(false);
   };
+
+  // If on /unsubscribe route: show minimal Zen-Tech Unsubscribe page
+  if (currentRoute === 'unsubscribe') {
+    return <Unsubscribe onBackToBlog={() => navigateTo('blog')} />;
+  }
 
   // If on /admin route:
   // - If not authenticated: show Zen Lock Screen Password Gateway

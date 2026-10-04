@@ -3,7 +3,14 @@ import { StoredPost } from '../../data/adminSeed';
 import { updateMarkdownCoverImage } from '../../services/articleMarkdownService';
 import { VectorThumbnail } from '../VectorThumbnail';
 import { ArticleMetadataLine } from '../ArticleMetadataLine';
-import { getTodayDateString, formatArticleDate } from '../../utils/dateUtils';
+import {
+  getTodayDateString,
+  formatArticleDate,
+  formatToDateTimeLocal,
+  isDateInFuture,
+  formatArticleDateTime,
+  getNowDateTimeLocalString,
+} from '../../utils/dateUtils';
 import {
   PanelRightClose,
   PanelRightOpen,
@@ -20,6 +27,7 @@ import {
   AlertCircle,
   Sparkles,
   Calendar,
+  Clock,
 } from 'lucide-react';
 
 interface MarkdownWorkspaceProps {
@@ -42,7 +50,13 @@ export const MarkdownWorkspace: React.FC<MarkdownWorkspaceProps> = ({
   onNotifySubscribersChange,
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [previewMode, setPreviewMode] = useState(false);
+  
+  // Editor mode: 'write' (Skriv), 'preview' (Forhåndsvisning), or 'braindump' (🧠 Brain-dump)
+  const [editorMode, setEditorMode] = useState<'write' | 'preview' | 'braindump'>('write');
+  const [brainDumpNotes, setBrainDumpNotes] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationError, setGenerationError] = useState<string | null>(null);
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -51,6 +65,9 @@ export const MarkdownWorkspace: React.FC<MarkdownWorkspaceProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [copiedPath, setCopiedPath] = useState(false);
+
+  // Scheduling calculation: if post status is 'published' but date is in the future
+  const isScheduled = post.status === 'published' && isDateInFuture(post.date);
 
   const generateSlug = (text: string) => {
     return text
@@ -86,6 +103,101 @@ export const MarkdownWorkspace: React.FC<MarkdownWorkspaceProps> = ({
       wordCount: words,
       readTime: `${readMinutes} min`,
     });
+  };
+
+  /**
+   * Opgave 1: Lokal AI Skriveassistent (Brain-dump mode)
+   * Sender prompt til lokal Ollama instans (http://localhost:11434/api/generate)
+   * med transparent fallback til den lokale Node server-proxy (/api/ollama/proxy)
+   */
+  const handleGenerateDraftFromNotes = async () => {
+    if (!brainDumpNotes.trim() || isGenerating) return;
+
+    setIsGenerating(true);
+    setGenerationError(null);
+
+    // Punkt 5: Prompt der specificerer rollen som teknisk skribent på dansk
+    const promptText = `Du er teknisk skribent. Omsæt disse noter til et struktureret blogindlæg formateret i Markdown. Brug dansk sprog.\n\nNoter:\n${brainDumpNotes}`;
+
+    try {
+      let generatedMarkdown = '';
+
+      // Punkt 4: Forsøg direkte fetch-kald til Ollama default endpoint http://localhost:11434/api/generate
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+        const directRes = await fetch('http://localhost:11434/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'llama3.2', // Standard model i Ollama (eller qwen2.5-coder / deepseek-r1)
+            prompt: promptText,
+            stream: false,
+          }),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (directRes.ok) {
+          const directData = await directRes.json();
+          if (directData && directData.response) {
+            generatedMarkdown = directData.response;
+          }
+        }
+      } catch (directErr) {
+        console.warn('Direkte Ollama-kald fejlede (f.eks. browser CORS), prøver via lokal backend-proxy:', directErr);
+      }
+
+      // Hvis direkte kald fejlede pga. browser CORS, anvend den lokale Node.js proxy-hjælpeservice
+      if (!generatedMarkdown) {
+        const proxyRes = await fetch('/api/ollama/proxy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            url: 'http://localhost:11434',
+            endpoint: '/api/generate',
+            payload: {
+              model: 'llama3.2',
+              prompt: promptText,
+              stream: false,
+            },
+          }),
+        });
+
+        if (proxyRes.ok) {
+          const proxyData = await proxyRes.json();
+          if (proxyData && proxyData.response) {
+            generatedMarkdown = proxyData.response;
+          }
+        } else {
+          const errData = await proxyRes.json().catch(() => null);
+          throw new Error(
+            errData?.error ||
+              'Kunne ikke forbinde til Ollama på http://localhost:11434. Kør `ollama serve` i terminalen.'
+          );
+        }
+      }
+
+      if (!generatedMarkdown || !generatedMarkdown.trim()) {
+        throw new Error('Modtog tomt svar fra den lokale LLM.');
+      }
+
+      // Punkt 6: Svaret fra den lokale AI indsættes i det primære "Skriv" (Markdown) felt
+      handleMarkdownChange(generatedMarkdown);
+
+      // Punkt 6: UI'et skifter automatisk tilbage til "Skriv"-tabben
+      setEditorMode('write');
+    } catch (err: any) {
+      console.error('[Brain-dump Lokal AI Fejl]:', err);
+      setGenerationError(
+        err?.message ||
+          'Kunne ikke forbinde til Ollama på http://localhost:11434/api/generate. Sørg for at køre `ollama serve` på din Mac.'
+      );
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   // Process dropped or selected image file
@@ -246,13 +358,14 @@ export const MarkdownWorkspace: React.FC<MarkdownWorkspaceProps> = ({
         {/* Left Side: Clean, borderless typing sheet on dark-slate green background */}
         <div className="flex-1 w-full bg-[#0c1d19] rounded-2xl p-6 sm:p-10 transition-all border border-[rgba(255,255,255,0.04)] relative">
           
-          {/* Top Sheet Toolbar: Mode Toggle (Edit / Preview) & Sidebar toggle affordance */}
+          {/* Top Sheet Toolbar: Mode Toggle (Skriv / Forhåndsvisning / 🧠 Brain-dump) & Sidebar toggle */}
           <div className="flex items-center justify-between pb-6 mb-6 border-b border-[rgba(255,255,255,0.05)] text-xs font-mono text-[#6c8077]">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
               <button
-                onClick={() => setPreviewMode(false)}
+                type="button"
+                onClick={() => setEditorMode('write')}
                 className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
-                  !previewMode ? 'text-white font-medium' : 'text-[#6c8077] hover:text-neutral-300'
+                  editorMode === 'write' ? 'text-white font-medium' : 'text-[#6c8077] hover:text-neutral-300'
                 }`}
               >
                 <Edit3 className="w-3.5 h-3.5" />
@@ -260,13 +373,26 @@ export const MarkdownWorkspace: React.FC<MarkdownWorkspaceProps> = ({
               </button>
               <span className="text-[#2b3d37]">/</span>
               <button
-                onClick={() => setPreviewMode(true)}
+                type="button"
+                onClick={() => setEditorMode('preview')}
                 className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
-                  previewMode ? 'text-white font-medium' : 'text-[#6c8077] hover:text-neutral-300'
+                  editorMode === 'preview' ? 'text-white font-medium' : 'text-[#6c8077] hover:text-neutral-300'
                 }`}
               >
                 <Eye className="w-3.5 h-3.5" />
                 <span>Forhåndsvisning</span>
+              </button>
+              <span className="text-[#2b3d37]">/</span>
+              <button
+                type="button"
+                onClick={() => setEditorMode('braindump')}
+                className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
+                  editorMode === 'braindump'
+                    ? 'text-[#10B981] font-semibold'
+                    : 'text-[#6c8077] hover:text-neutral-300'
+                }`}
+              >
+                <span>🧠 Brain-dump</span>
               </button>
             </div>
 
@@ -280,7 +406,8 @@ export const MarkdownWorkspace: React.FC<MarkdownWorkspaceProps> = ({
             </button>
           </div>
 
-          {!previewMode ? (
+          {/* Mode 1: Skriv (Primær Markdown Editor) */}
+          {editorMode === 'write' && (
             <div className="space-y-4">
               {/* Input for "Titel": NO borders, pristine typography */}
               <div>
@@ -288,7 +415,7 @@ export const MarkdownWorkspace: React.FC<MarkdownWorkspaceProps> = ({
                   type="text"
                   value={post.title}
                   onChange={(e) => handleTitleChange(e.target.value)}
-                  placeholder="Indtast artikelns titel..."
+                  placeholder="Indtast artiklens titel..."
                   className="w-full bg-transparent border-0 outline-none text-2xl sm:text-3xl lg:text-4xl font-semibold text-white tracking-tight placeholder-[#3f534c] focus:ring-0 px-0 leading-tight"
                 />
               </div>
@@ -316,7 +443,10 @@ export const MarkdownWorkspace: React.FC<MarkdownWorkspaceProps> = ({
                 />
               </div>
             </div>
-          ) : (
+          )}
+
+          {/* Mode 2: Forhåndsvisning (Visual Zen Preview) */}
+          {editorMode === 'preview' && (
             <div className="min-h-[560px] space-y-6">
               {/* 16:9 Cover preview or SVG Vector Generator fallback banner */}
               <div className="aspect-[16/9] w-full rounded-2xl overflow-hidden bg-[#091614] border border-white/5 relative flex items-center justify-center">
@@ -358,6 +488,83 @@ export const MarkdownWorkspace: React.FC<MarkdownWorkspaceProps> = ({
             </div>
           )}
 
+          {/* Mode 3: 🧠 Brain-dump (Lokal AI Skriveassistent) */}
+          {editorMode === 'braindump' && (
+            <div className="min-h-[560px] space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[rgba(255,255,255,0.04)]">
+                <div>
+                  <h2 className="text-lg font-semibold text-white tracking-tight flex items-center gap-2">
+                    <span>🧠 Brain-dump mode</span>
+                  </h2>
+                  <p className="text-xs text-[#728984] font-mono mt-0.5">
+                    Skriv rå noter og stikord. En lokal LLM (f.eks. Llama 3.2 via Ollama) omskriver dem til et helstøbt Markdown-udkast.
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 text-[10px] font-mono text-[#10B981] bg-[#10B981]/10 px-2.5 py-1 rounded-full border border-[#10B981]/20 self-start sm:self-auto shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
+                  <span>Ollama Local: http://localhost:11434</span>
+                </div>
+              </div>
+
+              {/* Separat tekstområde til løse noter */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-[#6c8077] block">
+                  Rå noter & bullet points
+                </label>
+                <textarea
+                  value={brainDumpNotes}
+                  onChange={(e) => setBrainDumpNotes(e.target.value)}
+                  disabled={isGenerating}
+                  placeholder="Skriv dine rå noter her...&#10;&#10;F.eks.:&#10;• M4 Pro 48GB med 14 CPU / 20 GPU kerner&#10;• Kørte benchmark med MLX vs Ollama på DeepSeek R1 32B og 14B&#10;• 32B giver 18 tok/s ved Q4_K_M med 22GB RAM forbrug&#10;• Konklusion: Perfekt balance mellem latency og hardwarekrav"
+                  className="w-full h-[360px] sm:h-[420px] bg-[#091614]/80 border border-[rgba(255,255,255,0.06)] rounded-xl p-4 text-sm font-mono text-neutral-200 placeholder-[#3f534c] leading-relaxed resize-none focus:outline-none focus:border-[#10B981]/60 focus:ring-1 focus:ring-[#10B981]/30 selection:bg-[#10B981]/30 selection:text-white transition-all disabled:opacity-50"
+                />
+              </div>
+
+              {/* Generer knap & Status */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-2">
+                <button
+                  type="button"
+                  onClick={handleGenerateDraftFromNotes}
+                  disabled={isGenerating || !brainDumpNotes.trim()}
+                  className="py-2.5 px-5 bg-[#10B981] hover:bg-[#059669] text-[#091614] rounded-xl text-xs font-semibold font-mono transition-all flex items-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(16,185,129,0.25)] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed select-none"
+                >
+                  {isGenerating ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin text-[#091614]" />
+                      <span>Tænker...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 text-[#091614]" />
+                      <span>✨ Generer udkast (Lokal AI)</span>
+                    </>
+                  )}
+                </button>
+
+                <div className="text-[11px] font-mono text-[#5c736a]">
+                  {isGenerating ? (
+                    <span className="text-[#10B981] animate-pulse">Lokal LLM genererer struktureret Markdown...</span>
+                  ) : (
+                    <span>Overføres direkte til "Skriv" ved fuldførelse.</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Fejlvisning hvis Ollama ikke svarer */}
+              {generationError && (
+                <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs font-mono flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="font-semibold text-rose-200">{generationError}</p>
+                    <p className="text-[11px] text-rose-300/80">
+                      Tip: Kør <code className="bg-black/40 px-1 py-0.5 rounded text-rose-200">ollama serve</code> og hav f.eks. <code className="bg-black/40 px-1 py-0.5 rounded text-rose-200">llama3.2</code> installeret på din Mac.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Bottom sheet status indicator */}
           <div className="pt-4 mt-6 border-t border-[rgba(255,255,255,0.04)] flex items-center justify-between text-[11px] font-mono text-[#5c736a]">
             <div>
@@ -392,26 +599,32 @@ export const MarkdownWorkspace: React.FC<MarkdownWorkspaceProps> = ({
                 </button>
               </div>
 
-              {/* 1. Dato (Publish Date) Calendar Date-Picker */}
+              {/* 1. Dato (Publish Date & Time) datetime-local Date-Picker */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label htmlFor="post-date-picker" className="text-[#6c8077] uppercase tracking-wider text-[10px] block font-medium">
-                    Dato (Udgivelsesdato)
+                    Dato (Udgivelsesdato & Tid)
                   </label>
-                  <span className="text-[10px] font-mono text-[#10B981]">
-                    {formatArticleDate(post.date || getTodayDateString(), 'da')}
+                  <span className={`text-[10px] font-mono ${isScheduled ? 'text-amber-400 font-medium' : 'text-[#10B981]'}`}>
+                    {formatArticleDateTime(post.date || getNowDateTimeLocalString(), 'da')}
                   </span>
                 </div>
                 <div className="relative flex items-center">
                   <input
                     id="post-date-picker"
-                    type="date"
-                    value={post.date || getTodayDateString()}
+                    type="datetime-local"
+                    value={formatToDateTimeLocal(post.date)}
                     onChange={(e) => onChange({ ...post, date: e.target.value })}
                     className="w-full bg-[#091614] border border-[rgba(255,255,255,0.08)] rounded-xl px-3 py-2 text-xs font-mono text-[#F1F5F4] focus:outline-none focus:border-[#10B981] transition-colors [color-scheme:dark] cursor-pointer"
                   />
                   <Calendar className="w-3.5 h-3.5 text-[#6c8077] absolute right-3 pointer-events-none" />
                 </div>
+                {isScheduled && (
+                  <p className="text-[10px] text-amber-400/90 font-mono leading-tight flex items-center gap-1.5 pt-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                    <span>Planlagt til fremtidig frigivelse (Scheduled)</span>
+                  </p>
+                )}
               </div>
 
               {/* 2. Hardware Specs */}
@@ -602,11 +815,18 @@ export const MarkdownWorkspace: React.FC<MarkdownWorkspaceProps> = ({
                 </div>
               </div>
 
-              {/* 3. Udgivelsesstatus (Draft/Publish) */}
+              {/* 3. Udgivelsesstatus (Draft/Publish/Scheduled) */}
               <div className="space-y-2">
-                <label className="text-[#6c8077] uppercase tracking-wider text-[10px] block">
-                  Udgivelsesstatus
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="text-[#6c8077] uppercase tracking-wider text-[10px] block">
+                    Udgivelsesstatus
+                  </label>
+                  {isScheduled && (
+                    <span className="text-[10px] font-mono text-amber-400 bg-amber-950/40 border border-amber-500/20 px-1.5 py-0.5 rounded">
+                      Planlagt
+                    </span>
+                  )}
+                </div>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
@@ -624,14 +844,39 @@ export const MarkdownWorkspace: React.FC<MarkdownWorkspaceProps> = ({
                     onClick={() => onChange({ ...post, status: 'published' })}
                     className={`py-2 px-3 rounded-lg text-xs transition-colors cursor-pointer border flex items-center justify-center gap-1.5 ${
                       post.status === 'published'
-                        ? 'bg-[#14332c] text-white border-[#1e4c41]'
+                        ? isScheduled
+                          ? 'bg-amber-950/40 text-amber-200 border-amber-500/30'
+                          : 'bg-[#14332c] text-white border-[#1e4c41]'
                         : 'bg-transparent text-[#7d9188] border-[rgba(255,255,255,0.05)] hover:text-white'
                     }`}
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] shadow-[0_0_6px_#10B981]" />
-                    <span>Publish</span>
+                    {/* Opgave 2: Hvis Publish er valgt, MEN dato er i fremtiden -> Scheduled med gul prik */}
+                    {post.status === 'published' ? (
+                      isScheduled ? (
+                        <>
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_#f59e0b] animate-pulse" />
+                          <span className="font-medium text-amber-300">Scheduled</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] shadow-[0_0_6px_#10B981]" />
+                          <span>Publish</span>
+                        </>
+                      )
+                    ) : (
+                      <span>Publish</span>
+                    )}
                   </button>
                 </div>
+
+                {isScheduled && (
+                  <div className="p-2 rounded-lg bg-amber-950/20 border border-amber-500/20 text-amber-300 text-[10px] font-mono leading-relaxed flex items-start gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1 shrink-0" />
+                    <span>
+                      Tidsindstillet publicering: Artiklen frigives automatisk når dato/tid nås ({formatArticleDateTime(post.date, 'da')}).
+                    </span>
+                  </div>
+                )}
 
                 {/* Send notifikation til abonnenter toggle / checkbox */}
                 <div className="pt-2">

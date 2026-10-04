@@ -25,6 +25,11 @@ export const Newsletter: React.FC<NewsletterProps> = () => {
       ? 'Ingen traditionelle nyhedsbreve. Tilmeld dig for udelukkende at modtage en simpel e-mail, når der udgives nye guides til Apple Silicon og on-device AI.'
       : (t('newsletterSubtitle') || 'Ingen traditionelle nyhedsbreve. Tilmeld dig for udelukkende at modtage en simpel e-mail, når der udgives nye guides til Apple Silicon og on-device AI.');
 
+  const privacyText =
+    lang === 'da'
+      ? 'Din e-mail deles aldrig. Afmeld med ét klik, når som helst.'
+      : (t('newsletterPrivacy') || 'Din e-mail deles aldrig. Afmeld med ét klik, når som helst.');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanEmail = email.trim();
@@ -86,36 +91,41 @@ export const Newsletter: React.FC<NewsletterProps> = () => {
               <span>{successMessage || (lang === 'da' ? 'Tak! Du er nu tilmeldt notifikationer.' : 'Thank you! You are now subscribed to notifications.')}</span>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="mt-6 flex flex-col sm:flex-row gap-3">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (error) setError('');
-                }}
-                disabled={isSubmitting}
-                placeholder={t('newsletterPlaceholder') || 'din@email.dk'}
-                className="flex-1 bg-canvas border border-borderSubtle text-titleText placeholder-bodyText text-xs sm:text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:border-accentGlow font-mono transition-colors disabled:opacity-50"
-              />
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="px-5 py-2.5 bg-titleText hover:opacity-90 text-canvas text-xs font-semibold rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap shadow-sm disabled:opacity-60"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    <span>{lang === 'da' ? 'Tilmelder...' : 'Subscribing...'}</span>
-                  </>
-                ) : (
-                  <>
-                    <span>{t('newsletterSubmit') || 'Tilmeld'}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </>
-                )}
-              </button>
-            </form>
+            <>
+              <form onSubmit={handleSubmit} className="mt-6 flex flex-col sm:flex-row gap-3">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (error) setError('');
+                  }}
+                  disabled={isSubmitting}
+                  placeholder={t('newsletterPlaceholder') || 'din@email.dk'}
+                  className="flex-1 bg-canvas border border-borderSubtle text-titleText placeholder-bodyText text-xs sm:text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:border-accentGlow font-mono transition-colors disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-5 py-2.5 bg-titleText hover:opacity-90 text-canvas text-xs font-semibold rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap shadow-sm disabled:opacity-60"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>{lang === 'da' ? 'Tilmelder...' : 'Subscribing...'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>{t('newsletterSubmit') || 'Tilmeld'}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </>
+                  )}
+                </button>
+              </form>
+              <p className="mt-3 text-xs text-[var(--text-body)] leading-relaxed">
+                {privacyText}
+              </p>
+            </>
           )}
 
           {error && <p className="text-xs text-rose-500 mt-2 font-mono">{error}</p>}

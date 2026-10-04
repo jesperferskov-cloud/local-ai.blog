@@ -71,6 +71,19 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({
 
   const filteredArticles = useMemo(() => {
     return articles.filter((article) => {
+      // =========================================================================
+      // Tidsindstillet Publicering (Scheduling) Filter:
+      // Filtrer posts på klientsiden, så fremtidige planlagte posts (Scheduled)
+      // ikke vises for normale brugere, før udgivelsesdato og klokkeslæt er nået:
+      // new Date(post.date) <= new Date()
+      // =========================================================================
+      if (article.date) {
+        const publishTimestamp = new Date(article.date).getTime();
+        if (!isNaN(publishTimestamp) && publishTimestamp > Date.now()) {
+          return false; // Fremtidig planlagt artikel skjules på klientsiden for normale læsere
+        }
+      }
+
       // 1. Search Query Filter
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();

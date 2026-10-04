@@ -250,101 +250,58 @@ app.post('/api/notify', async (req, res) => {
   }
 });
 
-// 5. GET /unsubscribe (Direct unsubscribe web endpoint)
-app.get('/unsubscribe', async (req, res) => {
+// 5. DELETE /api/unsubscribe (Zero-Cloud ét-kliks afmeldings-flow)
+app.delete('/api/unsubscribe', async (req, res) => {
   try {
-    const email = typeof req.query.email === 'string' ? req.query.email.trim().toLowerCase() : '';
-    if (email) {
-      const subscribers = await getSubscribers();
-      const filtered = subscribers.filter((s) => s.email.toLowerCase() !== email);
-      await saveSubscribers(filtered);
+    const emailParam = req.body?.email || req.query?.email;
+    const targetEmail = typeof emailParam === 'string' ? emailParam.trim().toLowerCase() : '';
+
+    if (!targetEmail || !targetEmail.includes('@')) {
+      return res.status(400).json({ error: 'Mangler eller ugyldig e-mailadresse til afmelding.' });
     }
 
-    return res.send(`<!DOCTYPE html>
-<html lang="da">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Afmeldt Notifikationer · local-ai.blog</title>
-  <style>
-    body {
-      background-color: #091614;
-      color: #F1F5F4;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 24px;
-      box-sizing: border-box;
+    const subscribers = await getSubscribers();
+    const initialCount = subscribers.length;
+    const filtered = subscribers.filter((s) => s.email.toLowerCase() !== targetEmail);
+    await saveSubscribers(filtered);
+
+    console.log(`[Zero-Cloud Unsubscribe] Afmeldt: ${targetEmail}. Resterende abonnenter: ${filtered.length}`);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Du er nu afmeldt. Tak for at du læste med.',
+      email: targetEmail,
+      removed: filtered.length < initialCount,
+      count: filtered.length,
+    });
+  } catch (error: any) {
+    console.error('[Unsubscribe API Error]:', error);
+    return res.status(500).json({ error: error?.message || 'Fejl under afmelding.' });
+  }
+});
+
+// Also support POST /api/unsubscribe for flexibility
+app.post('/api/unsubscribe', async (req, res) => {
+  try {
+    const emailParam = req.body?.email || req.query?.email;
+    const targetEmail = typeof emailParam === 'string' ? emailParam.trim().toLowerCase() : '';
+
+    if (!targetEmail || !targetEmail.includes('@')) {
+      return res.status(400).json({ error: 'Mangler eller ugyldig e-mailadresse til afmelding.' });
     }
-    .card {
-      background: #0c1d19;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      padding: 36px 32px;
-      max-width: 480px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
-    }
-    .badge {
-      display: inline-block;
-      color: #10B981;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 12px;
-    }
-    h1 {
-      font-size: 20px;
-      margin: 0 0 12px;
-      font-weight: 600;
-      color: #F1F5F4;
-    }
-    p {
-      font-size: 13px;
-      color: #728984;
-      line-height: 1.6;
-      margin: 0 0 24px;
-    }
-    .email {
-      color: #10B981;
-      font-weight: 500;
-    }
-    a {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 20px;
-      background: #14332c;
-      color: #F1F5F4;
-      border: 1px solid #1e4c41;
-      border-radius: 10px;
-      font-size: 12px;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-    a:hover {
-      background: #1c473d;
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <div class="badge">local-ai.blog</div>
-    <h1>Afmeldt Notifikationer</h1>
-    <p>
-      ${email ? `<span class="email">${email}</span> er nu fjernet fra listen.` : 'Du er nu afmeldt.'}<br>
-      Du vil ikke længere modtage e-mails om nye indlæg.
-    </p>
-    <a href="/">← Tilbage til bloggen</a>
-  </div>
-</body>
-</html>`);
-  } catch (err: any) {
-    return res.status(500).send('Fejl ved afmelding.');
+
+    const subscribers = await getSubscribers();
+    const filtered = subscribers.filter((s) => s.email.toLowerCase() !== targetEmail);
+    await saveSubscribers(filtered);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Du er nu afmeldt. Tak for at du læste med.',
+      email: targetEmail,
+      count: filtered.length,
+    });
+  } catch (error: any) {
+    return res.status(500).json({ error: error?.message || 'Fejl under afmelding.' });
   }
 });
 
@@ -470,7 +427,7 @@ app.post('/api/posts/sync', async (req, res) => {
 
     const readingTimeValue = post.readingTime || post.readTime || `${Math.max(1, Math.ceil((post.wordCount || 100) / 200))} min`;
     const hardwareValue = post.hardware || post.hardwareLabel || 'Apple Silicon';
-    const dateValue = post.date || (post.updatedAt ? post.updatedAt.slice(0, 10) : new Date().toISOString().slice(0, 10));
+    const dateValue = post.date || (post.updatedAt ? post.updatedAt.slice(0, 16) : new Date().toISOString().slice(0, 16));
 
     const frontmatter: Record<string, any> = {
       id: post.id || slug,
