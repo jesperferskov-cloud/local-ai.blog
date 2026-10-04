@@ -118,7 +118,7 @@ export const GridSwitcher: React.FC<GridSwitcherProps> = ({
 
   return (
     <div
-      className="inline-flex items-center gap-1 p-1 bg-[#0E1F1C] border border-white/5 rounded-lg select-none"
+      className="inline-flex items-center gap-1 p-1 bg-cardSurface border border-borderSubtle rounded-lg select-none transition-colors duration-300"
       role="group"
       aria-label={lang === 'da' ? 'Artikellayout' : 'Article layout'}
     >
@@ -134,15 +134,15 @@ export const GridSwitcher: React.FC<GridSwitcherProps> = ({
             aria-pressed={isActive}
             className={`relative flex items-center justify-center w-8 h-8 rounded-md transition-all duration-200 cursor-pointer ${
               isActive
-                ? 'text-[#F1F5F4] bg-white/[0.06]'
-                : 'text-[#728984] hover:text-[#F1F5F4] hover:bg-white/[0.03]'
+                ? 'text-titleText bg-black/5 dark:bg-white/[0.06]'
+                : 'text-bodyText hover:text-titleText hover:bg-black/[0.03] dark:hover:bg-white/[0.03]'
             }`}
           >
             {opt.icon(isActive)}
             {/* Subtle emerald dot for active state */}
             {isActive && (
               <span
-                className="absolute bottom-1 w-1 h-1 rounded-full bg-[#10B981] shadow-[0_0_6px_#10B981]"
+                className="absolute bottom-1 w-1 h-1 rounded-full bg-accentGlow shadow-[0_0_6px_var(--accent-glow)]"
                 aria-hidden="true"
               />
             )}

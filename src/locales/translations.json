@@ -20,8 +20,8 @@
     "search": "Søg",
     "clearSearch": "Ryd søgning",
     "noArticles": "Ingen artikler fundet",
-    "newsletterTitle": "Tekniske opdateringer i din indbakke",
-    "newsletterSubtitle": "Nye guides og målinger til Apple Silicon, Metal og on-device AI. Ingen markedsføring, kun substans.",
+    "newsletterTitle": "Notifikationer om nye indlæg",
+    "newsletterSubtitle": "Ingen traditionelle nyhedsbreve. Tilmeld dig for udelukkende at modtage en simpel e-mail, når der udgives nye guides til Apple Silicon og on-device AI.",
     "newsletterPlaceholder": "din@email.dk",
     "newsletterSubmit": "Tilmeld",
     "newsletterSuccess": "Tak for din tilmelding.",
@@ -43,7 +43,11 @@
     "tagAppleSilicon": "Apple Silicon",
     "tagCoreML": "CoreML",
     "tagPrivacy": "Privatliv",
-    "tagOllama": "Ollama"
+    "tagOllama": "Ollama",
+    "themeMorgengry": "Morgengry",
+    "themeAftengry": "Aftengry",
+    "switchToMorgengry": "Skift til Morgengry (lyst tema)",
+    "switchToAftengry": "Skift til Aftengry (mørkt tema)"
   },
   "en": {
     "guides": "Guides",
@@ -66,8 +70,8 @@
     "search": "Search",
     "clearSearch": "Clear search",
     "noArticles": "No articles found",
-    "newsletterTitle": "Technical updates directly in your inbox",
-    "newsletterSubtitle": "New guides and benchmarks for Apple Silicon, Metal, and on-device AI. Zero marketing noise.",
+    "newsletterTitle": "Notifications for new posts",
+    "newsletterSubtitle": "No traditional newsletters. Sign up solely to receive a simple email when new guides for Apple Silicon and on-device AI are published.",
     "newsletterPlaceholder": "your@email.com",
     "newsletterSubmit": "Subscribe",
     "newsletterSuccess": "Thank you for subscribing.",
@@ -89,6 +93,10 @@
     "tagAppleSilicon": "Apple Silicon",
     "tagCoreML": "CoreML",
     "tagPrivacy": "Privacy",
-    "tagOllama": "Ollama"
+    "tagOllama": "Ollama",
+    "themeMorgengry": "Morgengry",
+    "themeAftengry": "Aftengry",
+    "switchToMorgengry": "Switch to Morgengry (light theme)",
+    "switchToAftengry": "Switch to Aftengry (dark theme)"
   }
 }

@@ -3,10 +3,76 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* =========================================================================
+   1. Semantic CSS Variables (The Theme Bridge)
+   Aftengry (Dark Theme - Default) & Morgengry (Light Theme)
+   ========================================================================= */
+:root { /* Aftengry (Dark Theme - Default) */
+  --bg-outer: #161E1D;
+  --bg-inner: #091614;
+  --bg-card: #0E1F1C;
+  --text-title: #F1F5F4;
+  --text-body: #728984;
+  --accent-glow: #10B981;
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --halo-opacity: 0.03;
+
+  /* Organic Silicon Dunes Layer Tones */
+  --dune-base: #060F0E;
+  --dune-1: #060F0E;
+  --dune-2: #091614;
+  --dune-3: #0E1F1C;
+  --dune-crest: #10B981;
+  --dune-crest-opacity: 0.15;
+  --yogi-sheen-start: #163830;
+  --yogi-sheen-mid: #0B231D;
+  --yogi-sheen-end: #071814;
+  --shadow-main-container: 0 30px 100px -10px rgba(0, 0, 0, 0.6), 0 10px 30px -15px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+  --shadow-article-card: 0 12px 28px -6px rgba(0, 0, 0, 0.35);
+}
+
+html.light { /* Morgengry (Light Theme - Josh Comeau Fresh Sage Aesthetic) */
+  --bg-outer: #E6ECE9;
+  --bg-inner: #F4F8F6;
+  --bg-card: #FFFFFF;
+  --text-title: #0E1F1C;
+  --text-body: #405853;
+  --accent-glow: #059669;
+  --border-subtle: rgba(14, 31, 28, 0.08);
+  --halo-opacity: 0.05;
+
+  /* Organic Silicon Dunes Layer Tones */
+  --dune-base: #E8EFEB;
+  --dune-1: #DFE8E3;
+  --dune-2: #ECF3EF;
+  --dune-3: #F8FAF9;
+  --dune-crest: #059669;
+  --dune-crest-opacity: 0.35;
+  --yogi-sheen-start: #DFECE7;
+  --yogi-sheen-mid: #D0E1DA;
+  --yogi-sheen-end: #BED4CC;
+  --shadow-main-container: 0 25px 60px -12px rgba(14, 31, 28, 0.08), 0 10px 20px -8px rgba(14, 31, 28, 0.04), inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  --shadow-article-card: 0 8px 24px -4px rgba(14, 31, 28, 0.06), 0 2px 6px -1px rgba(14, 31, 28, 0.03);
+}
+
 @theme {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-display: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Semantic Theme Color Bridges */
+  --color-canvas: var(--bg-inner);
+  --color-cardSurface: var(--bg-card);
+  --color-card-surface: var(--bg-card);
+  --color-titleText: var(--text-title);
+  --color-title-text: var(--text-title);
+  --color-bodyText: var(--text-body);
+  --color-body-text: var(--text-body);
+  --color-accentGlow: var(--accent-glow);
+  --color-accent-glow: var(--accent-glow);
+  --color-borderSubtle: var(--border-subtle);
+  --color-border-subtle: var(--border-subtle);
+  --color-outer: var(--bg-outer);
 }
 
 @layer base {
@@ -16,8 +82,8 @@
 
   body {
     font-family: var(--font-sans);
-    background-color: #161E1D;
-    color: #F1F5F4;
+    background-color: var(--bg-outer);
+    color: var(--text-title);
     margin: 0;
     padding: 0;
   }
@@ -26,6 +92,38 @@
     font-family: var(--font-display);
     letter-spacing: -0.025em;
   }
+}
+
+/* =========================================================================
+   Theme Transition Helper: Soft, global cinematic sunrise/sunset transition
+   ========================================================================= */
+body,
+#root,
+[data-theme-container],
+header,
+main,
+footer,
+section,
+article,
+div,
+span,
+h1,
+h2,
+h3,
+p,
+a,
+button,
+input,
+svg,
+svg path,
+svg line,
+svg circle,
+svg rect,
+svg polygon,
+svg text {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 500ms;
 }
 
 /* Hide scrollbar for category pills while allowing smooth touch scroll */
@@ -77,12 +175,12 @@
   0%, 100% {
     transform: scale(1);
     opacity: 0.88;
-    filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.45));
+    filter: drop-shadow(0 0 6px var(--accent-glow));
   }
   50% {
     transform: scale(1.02);
     opacity: 1;
-    filter: drop-shadow(0 0 18px rgba(16, 185, 129, 0.8));
+    filter: drop-shadow(0 0 18px var(--accent-glow));
   }
 }
 
@@ -135,12 +233,12 @@
   0%, 100% {
     transform: scale(1);
     opacity: 0.88;
-    filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.65));
+    filter: drop-shadow(0 0 8px var(--accent-glow));
   }
   50% {
     transform: scale(1.12);
     opacity: 1;
-    filter: drop-shadow(0 0 22px rgba(16, 185, 129, 1));
+    filter: drop-shadow(0 0 22px var(--accent-glow));
   }
 }
 
@@ -236,7 +334,9 @@
   .animate-zen-ripple-fast,
   .animate-data-dash,
   .animate-stardust,
-  .animate-aura-pulse {
+  .animate-aura-pulse,
+  * {
     animation: none !important;
+    transition-duration: 0.01ms !important;
   }
 }

@@ -199,13 +199,13 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className="relative w-full overflow-hidden border-b border-white/5 py-12 sm:py-16 lg:py-24 px-5 sm:px-8 lg:px-12 xl:px-16"
+      className="relative w-full overflow-hidden border-b border-borderSubtle py-12 sm:py-16 lg:py-24 px-5 sm:px-8 lg:px-12 xl:px-16 transition-colors duration-500"
       aria-label="Hero - Udvalgt Artikel"
     >
       {/* ========================================================================= */}
       {/* 1. ORGANIC BOUNDED BACKDROP: THE SILICON DUNES                           */}
-      {/* Three layered, overlapping SVG waves colored in #060F0E, #091614, #0E1F1C */}
-      {/* with micro-thin glowing emerald (#10B981 at 0.15) outline along the crest */}
+      {/* Three layered, overlapping SVG waves with micro-thin glowing crest line  */}
+      {/* Automatically shifts from dark forest to soft morning sage (Morgengry)   */}
       {/* ========================================================================= */}
       <div className="absolute inset-0 pointer-events-none select-none overflow-hidden z-0" aria-hidden="true">
         <svg
@@ -231,39 +231,37 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
 
             {/* Subtle atmospheric radial spotlight over the Silicon Yogi area */}
             <radialGradient id="yogi-ambient-glow" cx="72%" cy="46%" r="40%">
-              <stop offset="0%" stopColor="#10B981" stopOpacity="0.08" />
-              <stop offset="60%" stopColor="#0E1F1C" stopOpacity="0.02" />
+              <stop offset="0%" stopColor="var(--accent-glow)" stopOpacity="0.08" />
+              <stop offset="60%" stopColor="var(--bg-card)" stopOpacity="0.02" />
               <stop offset="100%" stopColor="transparent" stopOpacity="0" />
             </radialGradient>
 
-            {/* Dune 1 Gradient: Deep soft shadow to forest base */}
+            {/* Dune 1 Gradient */}
             <linearGradient id="dune-1-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#060F0E" />
-              <stop offset="100%" stopColor="#050C0B" />
+              <stop offset="0%" stopColor="var(--dune-1)" />
+              <stop offset="100%" stopColor="var(--dune-base)" />
             </linearGradient>
 
-            {/* Dune 2 Gradient: Deepest Forest */}
+            {/* Dune 2 Gradient */}
             <linearGradient id="dune-2-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#091614" />
-              <stop offset="100%" stopColor="#071210" />
+              <stop offset="0%" stopColor="var(--dune-2)" />
+              <stop offset="100%" stopColor="var(--dune-1)" />
             </linearGradient>
 
-            {/* Dune 3 Gradient: Medium Slate Forest */}
+            {/* Dune 3 Gradient */}
             <linearGradient id="dune-3-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#0E1F1C" />
-              <stop offset="100%" stopColor="#0A1815" />
+              <stop offset="0%" stopColor="var(--dune-3)" />
+              <stop offset="100%" stopColor="var(--dune-2)" />
             </linearGradient>
           </defs>
 
           {/* Deep Base Horizon Fill */}
-          <rect width="1440" height="820" fill="#060F0E" />
+          <rect width="1440" height="820" fill="var(--dune-base)" />
 
           {/* Atmospheric Ambient Spotlight */}
           <rect width="1440" height="820" fill="url(#yogi-ambient-glow)" />
 
-          {/* ------------------------------------------------------------- */}
-          {/* DUNE 1: Deepest Horizon Layer (#060F0E) with subtle crest     */}
-          {/* ------------------------------------------------------------- */}
+          {/* DUNE 1 */}
           <g>
             <path
               d="M -50 180 C 260 70, 520 280, 840 160 C 1120 60, 1320 220, 1490 170 L 1490 850 L -50 850 Z"
@@ -272,78 +270,71 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
             {/* Glowing crest line */}
             <path
               d="M -50 180 C 260 70, 520 280, 840 160 C 1120 60, 1320 220, 1490 170"
-              stroke="#10B981"
+              stroke="var(--dune-crest)"
               strokeWidth="1.4"
-              strokeOpacity="0.15"
+              strokeOpacity="var(--dune-crest-opacity)"
               fill="none"
               filter="url(#crest-glow)"
             />
-            {/* Topographical echo contour lines for tactile depth */}
+            {/* Topographical echo contour lines */}
             <path
               d="M -50 205 C 260 95, 520 305, 840 185 C 1120 85, 1320 245, 1490 195"
-              stroke="#728984"
+              stroke="var(--text-body)"
               strokeWidth="0.8"
               strokeDasharray="4 8"
-              strokeOpacity="0.08"
+              strokeOpacity="0.12"
               fill="none"
             />
           </g>
 
-          {/* ------------------------------------------------------------- */}
-          {/* DUNE 2: Middle Dunes Layer (#091614 - Deepest Forest)         */}
-          {/* ------------------------------------------------------------- */}
+          {/* DUNE 2 */}
           <g>
             <path
               d="M -50 360 C 280 250, 600 440, 960 320 C 1220 240, 1380 390, 1490 350 L 1490 850 L -50 850 Z"
               fill="url(#dune-2-grad)"
             />
-            {/* Glowing crest line */}
             <path
               d="M -50 360 C 280 250, 600 440, 960 320 C 1220 240, 1380 390, 1490 350"
-              stroke="#10B981"
+              stroke="var(--dune-crest)"
               strokeWidth="1.6"
-              strokeOpacity="0.18"
+              strokeOpacity="var(--dune-crest-opacity)"
               fill="none"
               filter="url(#crest-glow)"
             />
-            {/* Topographical contour */}
             <path
               d="M -50 390 C 280 280, 600 470, 960 350 C 1220 270, 1380 420, 1490 380"
-              stroke="#728984"
+              stroke="var(--text-body)"
               strokeWidth="0.8"
               strokeDasharray="6 10"
-              strokeOpacity="0.07"
+              strokeOpacity="0.1"
               fill="none"
             />
           </g>
 
-          {/* ------------------------------------------------------------- */}
-          {/* DUNE 3: Foreground Dunes Layer (#0E1F1C - Medium Slate Forest)*/}
-          {/* ------------------------------------------------------------- */}
+          {/* DUNE 3 */}
           <g>
             <path
               d="M -50 540 C 320 460, 680 620, 1040 510 C 1260 450, 1390 530, 1490 500 L 1490 850 L -50 850 Z"
               fill="url(#dune-3-grad)"
             />
-            {/* Glowing crest line */}
             <path
               d="M -50 540 C 320 460, 680 620, 1040 510 C 1260 450, 1390 530, 1490 500"
-              stroke="#10B981"
+              stroke="var(--dune-crest)"
               strokeWidth="1.8"
-              strokeOpacity="0.22"
+              strokeOpacity="var(--dune-crest-opacity)"
               fill="none"
               filter="url(#crest-glow)"
             />
           </g>
 
-          {/* Playful Josh Comeau style stardust: drifting circuit sparkles in the dunes */}
+          {/* Stardust sparkles */}
           <g className="animate-stardust">
-            <circle cx="210" cy="140" r="1.5" fill="#10B981" fillOpacity="0.6" />
-            <circle cx="480" cy="220" r="1.2" fill="#728984" fillOpacity="0.5" />
-            <circle cx="680" cy="110" r="1.8" fill="#10B981" fillOpacity="0.5" />
-            <circle cx="1120" cy="160" r="1.5" fill="#10B981" fillOpacity="0.7" />
-            <circle cx="1280" cy="280" r="1.2" fill="#728984" fillOpacity="0.6" />
-            <circle cx="920" cy="460" r="1.4" fill="#10B981" fillOpacity="0.5" />
+            <circle cx="210" cy="140" r="1.5" fill="var(--accent-glow)" fillOpacity="0.6" />
+            <circle cx="480" cy="220" r="1.2" fill="var(--text-body)" fillOpacity="0.5" />
+            <circle cx="680" cy="110" r="1.8" fill="var(--accent-glow)" fillOpacity="0.5" />
+            <circle cx="1120" cy="160" r="1.5" fill="var(--accent-glow)" fillOpacity="0.7" />
+            <circle cx="1280" cy="280" r="1.2" fill="var(--text-body)" fillOpacity="0.6" />
+            <circle cx="920" cy="460" r="1.4" fill="var(--accent-glow)" fillOpacity="0.5" />
           </g>
         </svg>
       </div>
@@ -358,39 +349,39 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
         {/* ----------------------------------------------------------------------- */}
         <div className="lg:col-span-7 flex flex-col items-start text-left">
           
-          {/* 1. Small Caps Metadata: Tracked-wide, Soft Sage (#728984) */}
+          {/* 1. Small Caps Metadata: Tracked-wide, Soft Sage (var(--text-body)) */}
           <div className="flex items-center gap-2.5 mb-3 sm:mb-4 select-none">
             <span className="relative flex h-1.5 w-1.5 shrink-0" aria-hidden="true">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10B981] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#10B981]"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accentGlow opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accentGlow"></span>
             </span>
-            <span className="text-[11px] sm:text-xs font-mono uppercase tracking-[0.2em] text-[#728984] font-medium">
+            <span className="text-[11px] sm:text-xs font-mono uppercase tracking-[0.2em] text-bodyText font-medium">
               {eyebrowText}
             </span>
           </div>
 
-          {/* 2. Bold Editorial Title: text-5xl md:text-6xl, Warm off-white (#F1F5F4) */}
+          {/* 2. Bold Editorial Title: text-5xl md:text-6xl, Warm off-white / dark slate in light */}
           <h1 
             onClick={() => onReadArticle(featuredArticle)}
-            className="text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-6xl font-semibold text-[#F1F5F4] tracking-tight leading-[1.08] sm:leading-[1.10] mb-4 sm:mb-5 text-balance hover:text-white cursor-pointer transition-colors group"
+            className="text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-6xl font-semibold text-titleText tracking-tight leading-[1.08] sm:leading-[1.10] mb-4 sm:mb-5 text-balance hover:text-accentGlow cursor-pointer transition-colors group"
           >
             {heroTitle}
           </h1>
 
-          {/* 3. Subtitle / Deck: max-w-2xl, Soft Sage (#728984) */}
-          <p className="text-base sm:text-lg lg:text-xl text-[#728984] leading-relaxed mb-6 max-w-xl text-balance">
+          {/* 3. Subtitle / Deck: max-w-2xl, Soft Sage (var(--text-body)) */}
+          <p className="text-base sm:text-lg lg:text-xl text-bodyText leading-relaxed mb-6 max-w-xl text-balance">
             {heroSubtitle}
           </p>
 
           {/* 4. Cozy Integrated Handwritten Note: "Entusiast-deklaration" */}
           <AiDisclaimer text={disclaimerText} className="mb-6 sm:mb-7" />
 
-          {/* 5. Minimal Dark Pill Tags */}
+          {/* 5. Minimal Pill Tags */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 mb-7 sm:mb-8 select-none">
             {tags.map((tag: string) => (
               <span
                 key={tag}
-                className="px-3.5 py-1 rounded-full text-xs font-mono text-[#8c9e97] bg-white/5 border border-white/10 hover:border-[#10B981]/40 hover:text-[#F1F5F4] transition-all cursor-default"
+                className="px-3.5 py-1 rounded-full text-xs font-mono text-bodyText bg-cardSurface/80 border border-borderSubtle hover:border-accentGlow/40 hover:text-titleText transition-all cursor-default"
               >
                 {tag}
               </span>
@@ -403,20 +394,20 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
             <button
               type="button"
               onClick={handleScrollToAbout}
-              className="flex items-center gap-3 py-2 px-3.5 rounded-xl border border-white/5 bg-[#0E1F1C]/90 hover:border-white/20 hover:bg-[#0E1F1C] transition-all cursor-pointer group/author focus:outline-none focus-visible:ring-1 focus-visible:ring-[#10B981] shadow-sm text-left"
+              className="flex items-center gap-3 py-2 px-3.5 rounded-xl border border-borderSubtle bg-cardSurface/90 hover:border-accentGlow/40 hover:bg-cardSurface transition-all cursor-pointer group/author focus:outline-none focus-visible:ring-1 focus-visible:ring-accentGlow shadow-sm text-left"
               title={lang === 'da' ? 'Gå til Bag om bloggen (Jesper)' : 'Jump to About Jesper'}
               aria-label={`${authorName} • ${authorRole}`}
             >
-              <div className="w-8 h-8 rounded-full bg-[#132B25] border border-white/10 group-hover/author:border-[#10B981]/60 group-hover/author:shadow-[0_0_10px_rgba(16,185,129,0.35)] flex items-center justify-center shrink-0 transition-all">
-                <span className="text-xs font-mono font-medium text-[#10B981]">
+              <div className="w-8 h-8 rounded-full bg-canvas border border-borderSubtle group-hover/author:border-accentGlow/60 group-hover/author:shadow-[0_0_10px_var(--accent-glow)] flex items-center justify-center shrink-0 transition-all">
+                <span className="text-xs font-mono font-medium text-accentGlow">
                   {authorName.charAt(0) || 'J'}
                 </span>
               </div>
               <div className="flex flex-col">
-                <strong className="text-xs sm:text-sm text-[#F1F5F4] font-medium group-hover/author:text-white transition-colors">
+                <strong className="text-xs sm:text-sm text-titleText font-medium group-hover/author:text-accentGlow transition-colors">
                   {authorName}
                 </strong>
-                <span className="text-[11px] text-[#728984] group-hover/author:text-[#9bb3ae] transition-colors">
+                <span className="text-[11px] text-bodyText transition-colors">
                   {authorRole}
                 </span>
               </div>
@@ -426,7 +417,7 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
             <button
               type="button"
               onClick={() => onReadArticle(featuredArticle)}
-              className="inline-flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl bg-[#10B981] hover:bg-[#059669] text-[#091614] font-medium text-xs sm:text-sm transition-all duration-200 shadow-[0_4px_16px_rgba(16,185,129,0.25)] hover:shadow-[0_6px_22px_rgba(16,185,129,0.4)] cursor-pointer group/cta focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="inline-flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl bg-accentGlow hover:brightness-105 text-white font-medium text-xs sm:text-sm transition-all duration-200 shadow-[0_4px_16px_rgba(16,185,129,0.25)] hover:shadow-[0_6px_22px_rgba(16,185,129,0.4)] cursor-pointer group/cta focus:outline-none focus-visible:ring-2 focus-visible:ring-accentGlow"
             >
               <span>{readActionLabel}</span>
               <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover/cta:translate-x-1" />
@@ -456,7 +447,7 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
             className="relative w-full max-w-[460px] sm:max-w-[480px] lg:max-w-[520px] aspect-square flex items-center justify-center cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981] rounded-3xl"
           >
             {/* Subtle Interactive Ambient Glow */}
-            <div className="absolute inset-4 rounded-full bg-[#10B981]/5 filter blur-3xl pointer-events-none group-hover:bg-[#10B981]/12 transition-all duration-500" />
+            <div className="absolute inset-4 rounded-full bg-accentGlow/5 filter blur-3xl pointer-events-none group-hover:bg-accentGlow/15 transition-all duration-500" />
 
             {/* =================================================================== */}
             {/* THE MASTER SILICON YOGI VECTOR ART                                 */}
@@ -470,32 +461,32 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
               <defs>
                 {/* Zen Core Hypnotic Emerald Radial Glow */}
                 <radialGradient id="zen-emerald-glow" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#34D399" stopOpacity="0.9" />
-                  <stop offset="35%" stopColor="#10B981" stopOpacity="0.65" />
-                  <stop offset="70%" stopColor="#064E3B" stopOpacity="0.25" />
+                  <stop offset="0%" stopColor="var(--accent-glow)" stopOpacity="0.9" />
+                  <stop offset="35%" stopColor="var(--accent-glow)" stopOpacity="0.65" />
+                  <stop offset="70%" stopColor="var(--bg-inner)" stopOpacity="0.25" />
                   <stop offset="100%" stopColor="transparent" stopOpacity="0" />
                 </radialGradient>
 
                 {/* Substrate Top Metallic Sheen */}
                 <linearGradient id="substrate-surface-sheen" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#163830" />
-                  <stop offset="45%" stopColor="#0B231D" />
-                  <stop offset="100%" stopColor="#071814" />
+                  <stop offset="0%" stopColor="var(--yogi-sheen-start)" />
+                  <stop offset="45%" stopColor="var(--yogi-sheen-mid)" />
+                  <stop offset="100%" stopColor="var(--yogi-sheen-end)" />
                 </linearGradient>
 
                 {/* Silicon Die Mirror Reflection Sheen */}
                 <linearGradient id="silicon-die-sheen" x1="15%" y1="0%" x2="85%" y2="100%">
-                  <stop offset="0%" stopColor="#1E473D" stopOpacity="0.95" />
-                  <stop offset="35%" stopColor="#102F28" stopOpacity="0.9" />
-                  <stop offset="50%" stopColor="#255C50" stopOpacity="0.75" />
-                  <stop offset="65%" stopColor="#0B231E" stopOpacity="0.95" />
-                  <stop offset="100%" stopColor="#061814" stopOpacity="0.95" />
+                  <stop offset="0%" stopColor="var(--bg-card)" stopOpacity="0.95" />
+                  <stop offset="35%" stopColor="var(--bg-inner)" stopOpacity="0.9" />
+                  <stop offset="50%" stopColor="var(--accent-glow)" stopOpacity="0.3" />
+                  <stop offset="65%" stopColor="var(--bg-card)" stopOpacity="0.95" />
+                  <stop offset="100%" stopColor="var(--bg-inner)" stopOpacity="0.95" />
                 </linearGradient>
 
                 {/* Gold/Copper Pin Gradient */}
                 <linearGradient id="pin-gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.8" />
-                  <stop offset="100%" stopColor="#10B981" stopOpacity="0.7" />
+                  <stop offset="100%" stopColor="var(--accent-glow)" stopOpacity="0.7" />
                 </linearGradient>
 
                 {/* Drop shadow for floating CPU */}
@@ -512,10 +503,10 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
                 {/* Arch 5 (Outermost): Emerald halo arc */}
                 <path
                   d={`M ${270 - r5} 325 A ${r5} ${r5} 0 0 1 ${270 + r5} 325`}
-                  stroke="#10B981"
+                  stroke="var(--accent-glow)"
                   strokeWidth="1.2"
                   strokeDasharray="4 8"
-                  strokeOpacity="0.22"
+                  strokeOpacity="0.3"
                   className="animate-data-dash"
                   fill="none"
                 />
@@ -523,29 +514,29 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
                 {/* Arch 4: Soft Sage binary trace */}
                 <path
                   d={`M ${270 - r4} 325 A ${r4} ${r4} 0 0 1 ${270 + r4} 325`}
-                  stroke="#728984"
+                  stroke="var(--text-body)"
                   strokeWidth="1.4"
                   strokeDasharray="16 8 3 8"
-                  strokeOpacity="0.35"
-                  className="group-hover:stroke-opacity-60 transition-all"
+                  strokeOpacity="0.4"
+                  className="group-hover:stroke-opacity-65 transition-all"
                   fill="none"
                 />
 
                 {/* Arch 3: Vibrant Emerald primary data channel */}
                 <path
                   d={`M ${270 - r3} 325 A ${r3} ${r3} 0 0 1 ${270 + r3} 325`}
-                  stroke="#10B981"
+                  stroke="var(--accent-glow)"
                   strokeWidth="2.0"
                   strokeDasharray="36 12 8 12"
-                  strokeOpacity="0.55"
-                  className="group-hover:stroke-opacity-80 transition-all animate-data-dash"
+                  strokeOpacity="0.65"
+                  className="group-hover:stroke-opacity-90 transition-all animate-data-dash"
                   fill="none"
                 />
 
                 {/* Arch 2: Harmonic Sage trace */}
                 <path
                   d={`M ${270 - r2} 325 A ${r2} ${r2} 0 0 1 ${270 + r2} 325`}
-                  stroke="#728984"
+                  stroke="var(--text-body)"
                   strokeWidth="1.5"
                   strokeDasharray="8 6"
                   strokeOpacity="0.45"
@@ -555,10 +546,10 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
                 {/* Arch 1 (Innermost): High-frequency neural focus arc */}
                 <path
                   d={`M ${270 - r1} 325 A ${r1} ${r1} 0 0 1 ${270 + r1} 325`}
-                  stroke="#10B981"
+                  stroke="var(--accent-glow)"
                   strokeWidth="1.8"
                   strokeDasharray="20 10"
-                  strokeOpacity="0.7"
+                  strokeOpacity="0.75"
                   className="group-hover:stroke-opacity-95 transition-all"
                   fill="none"
                 />
@@ -570,15 +561,15 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
                     cx="270"
                     cy={325 - r3}
                     r="4.5"
-                    fill="#10B981"
-                    className="shadow-[0_0_10px_#10B981]"
+                    fill="var(--accent-glow)"
+                    className="shadow-[0_0_10px_var(--accent-glow)]"
                   />
                   <circle
                     cx="270"
                     cy={325 - r3}
                     r="8"
                     fill="none"
-                    stroke="#10B981"
+                    stroke="var(--accent-glow)"
                     strokeWidth="0.8"
                     strokeOpacity="0.5"
                   />
@@ -588,7 +579,7 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
                     cx={270 - r4 * 0.707}
                     cy={325 - r4 * 0.707}
                     r="3.5"
-                    fill="#728984"
+                    fill="var(--text-body)"
                     fillOpacity="0.8"
                   />
 
@@ -597,7 +588,7 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
                     cx={270 + r4 * 0.707}
                     cy={325 - r4 * 0.707}
                     r="3.5"
-                    fill="#10B981"
+                    fill="var(--accent-glow)"
                     fillOpacity="0.85"
                   />
 
@@ -606,7 +597,7 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
                     cx={270 - r2 * 0.5}
                     cy={325 - r2 * 0.866}
                     r="3"
-                    fill="#10B981"
+                    fill="var(--accent-glow)"
                     fillOpacity="0.75"
                   />
 
@@ -615,7 +606,7 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
                     cx={270 + r2 * 0.5}
                     cy={325 - r2 * 0.866}
                     r="3"
-                    fill="#728984"
+                    fill="var(--text-body)"
                     fillOpacity="0.7"
                   />
 
@@ -623,7 +614,7 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
                   <text
                     x={270 - r3 * 0.8}
                     y={325 - r3 * 0.55}
-                    fill="#728984"
+                    fill="var(--text-body)"
                     fontSize="7.5"
                     fontFamily="monospace"
                     letterSpacing="0.1em"
@@ -635,7 +626,7 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
                   <text
                     x={270 + r3 * 0.74}
                     y={325 - r3 * 0.55}
-                    fill="#10B981"
+                    fill="var(--accent-glow)"
                     fontSize="7.5"
                     fontFamily="monospace"
                     letterSpacing="0.1em"
@@ -647,7 +638,7 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
                   <text
                     x={270 - r4 * 0.35}
                     y={325 - r4 * 0.92}
-                    fill="#728984"
+                    fill="var(--text-body)"
                     fontSize="7"
                     fontFamily="monospace"
                     letterSpacing="0.15em"
@@ -659,7 +650,7 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
                   <text
                     x={270 + r4 * 0.32}
                     y={325 - r4 * 0.92}
-                    fill="#10B981"
+                    fill="var(--accent-glow)"
                     fontSize="7"
                     fontFamily="monospace"
                     letterSpacing="0.15em"
@@ -1021,13 +1012,13 @@ export const HeroFeatured: React.FC<HeroFeaturedProps> = ({ onReadArticle, onScr
             </svg>
 
             {/* Playful Floating Badge underneath the visual: 100% Local / Zero Cloud */}
-            <div className="absolute -bottom-3 sm:-bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0E1F1C]/90 border border-white/10 backdrop-blur-md text-[10px] sm:text-[11px] font-mono text-[#728984] group-hover:border-[#10B981]/50 group-hover:text-[#F1F5F4] transition-all shadow-md select-none whitespace-nowrap">
+            <div className="absolute -bottom-3 sm:-bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cardSurface/90 border border-borderSubtle backdrop-blur-md text-[10px] sm:text-[11px] font-mono text-bodyText group-hover:border-accentGlow/50 group-hover:text-titleText transition-all shadow-md select-none whitespace-nowrap">
               <span className="relative flex h-1.5 w-1.5 shrink-0">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10B981] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#10B981]"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accentGlow opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accentGlow"></span>
               </span>
               <span>100% ON-DEVICE • ZERO CLOUD</span>
-              <Sparkles className="w-3 h-3 text-[#10B981] opacity-70 group-hover:opacity-100 transition-opacity" />
+              <Sparkles className="w-3 h-3 text-accentGlow opacity-70 group-hover:opacity-100 transition-opacity" />
             </div>
 
           </div>

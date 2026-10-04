@@ -4,6 +4,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import matter from 'gray-matter';
+import nodemailer, { type Transporter } from 'nodemailer';
 import { GoogleGenAI } from '@google/genai';
 import { compileStaticContent } from './scripts/build-static-content.ts';
 
@@ -35,6 +36,317 @@ if (!fs.existsSync(POST_IMAGES_DIR)) {
 
 // Serve /images statically in all environments
 app.use('/images', express.static(path.resolve(PUBLIC_DIR, 'images')));
+
+// ----------------------------------------------------
+// Zero-Cloud Local Subscriber Storage & Notification Center
+// Flat JSON File: /content/subscribers.json
+// ----------------------------------------------------
+const SUBSCRIBERS_FILE = path.resolve(process.cwd(), 'content/subscribers.json');
+
+interface Subscriber {
+  email: string;
+  date: string;
+}
+
+// Ensure /content/subscribers.json exists with an empty array if not present
+async function getSubscribers(): Promise<Subscriber[]> {
+  try {
+    const contentDir = path.dirname(SUBSCRIBERS_FILE);
+    if (!fs.existsSync(contentDir)) {
+      await fs.promises.mkdir(contentDir, { recursive: true });
+    }
+    if (!fs.existsSync(SUBSCRIBERS_FILE)) {
+      await fs.promises.writeFile(SUBSCRIBERS_FILE, JSON.stringify([], null, 2), 'utf-8');
+      return [];
+    }
+    const data = await fs.promises.readFile(SUBSCRIBERS_FILE, 'utf-8');
+    const parsed = JSON.parse(data);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    console.error('[Subscribers File Error]:', err);
+    return [];
+  }
+}
+
+async function saveSubscribers(list: Subscriber[]): Promise<void> {
+  const contentDir = path.dirname(SUBSCRIBERS_FILE);
+  if (!fs.existsSync(contentDir)) {
+    await fs.promises.mkdir(contentDir, { recursive: true });
+  }
+  await fs.promises.writeFile(SUBSCRIBERS_FILE, JSON.stringify(list, null, 2), 'utf-8');
+}
+
+// 1. POST /api/subscribe (Add email + date, avoid duplicates)
+app.post('/api/subscribe', async (req, res) => {
+  try {
+    const { email } = req.body || {};
+    const trimmed = typeof email === 'string' ? email.trim().toLowerCase() : '';
+    if (!trimmed || !trimmed.includes('@')) {
+      return res.status(400).json({ error: 'Indtast venligst en gyldig e-mailadresse.' });
+    }
+
+    const subscribers = await getSubscribers();
+    const existing = subscribers.find((s) => s.email.toLowerCase() === trimmed);
+    if (existing) {
+      return res.json({
+        success: true,
+        alreadySubscribed: true,
+        message: 'Du er allerede tilmeldt notifikationer.',
+        subscriber: existing,
+      });
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    const newSub: Subscriber = {
+      email: trimmed,
+      date: today,
+    };
+    subscribers.push(newSub);
+    await saveSubscribers(subscribers);
+
+    return res.json({
+      success: true,
+      message: 'Tilmeldt notifikationer om nye indlæg.',
+      subscriber: newSub,
+    });
+  } catch (error: any) {
+    console.error('[Subscribe API Error]:', error);
+    return res.status(500).json({ error: error?.message || 'Fejl under tilmelding.' });
+  }
+});
+
+// 2. GET /api/subscribers (Return list to Admin Panel)
+app.get('/api/subscribers', async (req, res) => {
+  try {
+    const subscribers = await getSubscribers();
+    return res.json(subscribers);
+  } catch (error: any) {
+    return res.status(500).json({ error: error?.message || 'Kunne ikke hente abonnentlisten.' });
+  }
+});
+
+// 3. DELETE /api/subscribers (Remove a specific email)
+app.delete('/api/subscribers', async (req, res) => {
+  try {
+    const emailParam = req.body?.email || req.query.email;
+    const targetEmail = typeof emailParam === 'string' ? emailParam.trim().toLowerCase() : '';
+    if (!targetEmail) {
+      return res.status(400).json({ error: 'Mangler e-mail til sletning.' });
+    }
+
+    const subscribers = await getSubscribers();
+    const initialCount = subscribers.length;
+    const filtered = subscribers.filter((s) => s.email.toLowerCase() !== targetEmail);
+
+    if (filtered.length === initialCount) {
+      return res.status(404).json({ error: 'Abonnenten blev ikke fundet i listen.' });
+    }
+
+    await saveSubscribers(filtered);
+    return res.json({
+      success: true,
+      message: `Abonnent ${targetEmail} slettet.`,
+      count: filtered.length,
+    });
+  } catch (error: any) {
+    return res.status(500).json({ error: error?.message || 'Fejl ved sletning af abonnent.' });
+  }
+});
+
+// 4. POST /api/notify (Trigger mail-udsendelse to all subscribers)
+app.post('/api/notify', async (req, res) => {
+  try {
+    const { title, slug } = req.body || {};
+    if (!title || !slug) {
+      return res.status(400).json({ error: 'Mangler artiklens title og slug.' });
+    }
+
+    const subscribers = await getSubscribers();
+    if (subscribers.length === 0) {
+      return res.json({
+        success: true,
+        count: 0,
+        message: 'Ingen tilmeldte abonnenter at sende til.',
+      });
+    }
+
+    const smtpHost = process.env.SMTP_HOST;
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+    const smtpPort = Number(process.env.SMTP_PORT) || 587;
+    const smtpFrom = process.env.SMTP_FROM || `local-ai.blog <${smtpUser || 'notifications@local-ai.blog'}>`;
+
+    const isSmtpConfigured = Boolean(
+      smtpHost &&
+      smtpUser &&
+      smtpPass &&
+      !smtpHost.includes('example.com')
+    );
+
+    let transporter: Transporter | null = null;
+    if (isSmtpConfigured) {
+      try {
+        transporter = nodemailer.createTransport({
+          host: smtpHost,
+          port: smtpPort,
+          secure: smtpPort === 465,
+          auth: {
+            user: smtpUser,
+            pass: smtpPass,
+          },
+        });
+      } catch (tErr) {
+        console.error('[SMTP Transporter Setup Error]:', tErr);
+        transporter = null;
+      }
+    }
+
+    const results: Array<{ email: string; status: 'sent' | 'simulated' | 'failed'; error?: string }> = [];
+
+    for (const sub of subscribers) {
+      // Plain-text Zen-Tech Template
+      // "Emne: Nyt indlæg: {{title}}\n\nHej,\n\nDer er netop udgivet et nyt indlæg på local-ai.blog.\n\nLæs det her: https://local-ai.blog/posts/{{slug}}\n\n--\nDette er en automatisk notifikation.\nAfmeld fremtidige notifikationer: https://local-ai.blog/unsubscribe?email={{email}}"
+      const subject = `Nyt indlæg: ${title}`;
+      const plainTextContent = `Hej,\n\nDer er netop udgivet et nyt indlæg på local-ai.blog.\n\nLæs det her: https://local-ai.blog/posts/${slug}\n\n--\nDette er en automatisk notifikation.\nAfmeld fremtidige notifikationer: https://local-ai.blog/unsubscribe?email=${encodeURIComponent(sub.email)}`;
+
+      if (transporter && isSmtpConfigured) {
+        try {
+          await transporter.sendMail({
+            from: smtpFrom,
+            to: sub.email,
+            subject: subject,
+            text: plainTextContent,
+          });
+          results.push({ email: sub.email, status: 'sent' });
+        } catch (mailError: any) {
+          console.error(`[Mail Error] Failed to send to ${sub.email}:`, mailError?.message);
+          results.push({ email: sub.email, status: 'failed', error: mailError?.message });
+        }
+      } else {
+        // Zero-Cloud Local-First Development / Local Execution Simulation
+        console.log(`\n==================================================`);
+        console.log(`[LOCAL NOTIFICATION GATEWAY (Zero-Cloud / Local-First)]`);
+        console.log(`To: ${sub.email}`);
+        console.log(`Emne: ${subject}`);
+        console.log(`--------------------------------------------------`);
+        console.log(plainTextContent);
+        console.log(`==================================================\n`);
+        results.push({ email: sub.email, status: 'simulated' });
+      }
+    }
+
+    return res.json({
+      success: true,
+      count: results.length,
+      simulated: !isSmtpConfigured || !transporter,
+      results,
+      message: isSmtpConfigured && transporter
+        ? `Notifikation sendt til ${results.length} abonnent(er).`
+        : `Lokal notifikation simuleret for ${results.length} abonnent(er) (SMTP ikke sat).`,
+    });
+  } catch (error: any) {
+    console.error('[Notify API Error]:', error);
+    return res.status(500).json({ error: error?.message || 'Fejl under afsendelse af notifikationer.' });
+  }
+});
+
+// 5. GET /unsubscribe (Direct unsubscribe web endpoint)
+app.get('/unsubscribe', async (req, res) => {
+  try {
+    const email = typeof req.query.email === 'string' ? req.query.email.trim().toLowerCase() : '';
+    if (email) {
+      const subscribers = await getSubscribers();
+      const filtered = subscribers.filter((s) => s.email.toLowerCase() !== email);
+      await saveSubscribers(filtered);
+    }
+
+    return res.send(`<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Afmeldt Notifikationer · local-ai.blog</title>
+  <style>
+    body {
+      background-color: #091614;
+      color: #F1F5F4;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+    .card {
+      background: #0c1d19;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 36px 32px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+    }
+    .badge {
+      display: inline-block;
+      color: #10B981;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: 20px;
+      margin: 0 0 12px;
+      font-weight: 600;
+      color: #F1F5F4;
+    }
+    p {
+      font-size: 13px;
+      color: #728984;
+      line-height: 1.6;
+      margin: 0 0 24px;
+    }
+    .email {
+      color: #10B981;
+      font-weight: 500;
+    }
+    a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: #14332c;
+      color: #F1F5F4;
+      border: 1px solid #1e4c41;
+      border-radius: 10px;
+      font-size: 12px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    a:hover {
+      background: #1c473d;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">local-ai.blog</div>
+    <h1>Afmeldt Notifikationer</h1>
+    <p>
+      ${email ? `<span class="email">${email}</span> er nu fjernet fra listen.` : 'Du er nu afmeldt.'}<br>
+      Du vil ikke længere modtage e-mails om nye indlæg.
+    </p>
+    <a href="/">← Tilbage til bloggen</a>
+  </div>
+</body>
+</html>`);
+  } catch (err: any) {
+    return res.status(500).send('Fejl ved afmelding.');
+  }
+});
 
 // Upload Cover Image endpoint for Admin Panel
 app.post('/api/upload/cover', async (req, res) => {

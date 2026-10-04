@@ -114,16 +114,16 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({
   }, [gridLayout]);
 
   return (
-    <section id="artikler" className="w-full px-6 sm:px-10 lg:px-12 py-12 lg:py-16">
+    <section id="artikler" className="w-full px-6 sm:px-10 lg:px-12 py-12 lg:py-16 transition-colors duration-500">
       {/* Section Header: "Artikler" / "Articles" */}
       <div className="pb-6">
-        <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#F1F5F4]">
+        <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-titleText">
           {lang === 'da' ? 'Artikler' : 'Articles'}
         </h2>
       </div>
 
       {/* Categories on left & Layout Toggle Switcher on right */}
-      <div className="flex items-center justify-between gap-4 pb-8 sm:pb-10 border-b border-white/5">
+      <div className="flex items-center justify-between gap-4 pb-8 sm:pb-10 border-b border-borderSubtle">
         <div className="flex items-center gap-7 sm:gap-9 overflow-x-auto no-scrollbar py-1">
           {categoriesList.map((cat) => {
             const isActive = activeCategory === cat.id;
@@ -132,11 +132,11 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({
                 key={cat.id}
                 onClick={() => onSelectCategory(cat.id)}
                 className={`flex items-center gap-2 py-1 text-xs sm:text-sm tracking-wide transition-colors cursor-pointer whitespace-nowrap ${
-                  isActive ? 'text-[#F1F5F4] font-medium' : 'text-[#728984] hover:text-[#F1F5F4]'
+                  isActive ? 'text-titleText font-medium' : 'text-bodyText hover:text-titleText'
                 }`}
               >
                 {isActive && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-accentGlow shadow-[0_0_8px_var(--accent-glow)]" />
                 )}
                 <span>{cat.label}</span>
               </button>
@@ -169,13 +169,13 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 text-[#728984]">
+          <div className="text-center py-16 text-bodyText">
             <p className="text-sm">
               {t('noArticles')}
             </p>
             <button
               onClick={() => onSelectCategory('all')}
-              className="mt-4 text-xs font-mono text-[#10B981] hover:underline cursor-pointer"
+              className="mt-4 text-xs font-mono text-accentGlow hover:underline cursor-pointer"
             >
               {lang === 'da' ? 'Vis alle artikler' : 'Show all articles'}
             </button>

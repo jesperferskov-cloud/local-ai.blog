@@ -32,23 +32,23 @@ export const ArticleFallbackBanner: React.FC<ArticleFallbackBannerProps> = ({
   if (bannerDismissed) return null;
 
   return (
-    <div className="w-full mb-6 rounded-xl bg-[#0E1F1C] border border-white/10 p-3.5 sm:p-4 text-xs font-mono transition-all animate-in fade-in duration-200">
+    <div className="w-full mb-6 rounded-xl bg-cardSurface border border-borderSubtle p-3.5 sm:p-4 text-xs font-mono transition-all animate-in fade-in duration-200">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         
         {/* Left: Message & Direct Link */}
         <div className="flex items-center gap-2.5 flex-wrap">
-          <div className="flex items-center gap-1.5 text-emerald-400 shrink-0">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] shadow-[0_0_6px_#10B981]" />
-            <Globe className="w-3.5 h-3.5 text-[#10B981]" />
+          <div className="flex items-center gap-1.5 text-accentGlow shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-accentGlow shadow-[0_0_6px_var(--accent-glow)]" />
+            <Globe className="w-3.5 h-3.5 text-accentGlow" />
           </div>
 
-          <span className="text-[#F1F5F4]">
+          <span className="text-titleText">
             This article is currently only available in Danish.
           </span>
 
           <button
             onClick={onSwitchToDanish}
-            className="inline-flex items-center gap-1 text-[#10B981] hover:text-emerald-300 font-medium underline underline-offset-4 decoration-[#10B981]/40 hover:decoration-[#10B981] transition-all cursor-pointer"
+            className="inline-flex items-center gap-1 text-accentGlow hover:opacity-80 font-medium underline underline-offset-4 decoration-accentGlow/40 hover:decoration-accentGlow transition-all cursor-pointer"
           >
             <span>[Read Danish Version]</span>
             <ArrowRight className="w-3 h-3" />
@@ -56,15 +56,15 @@ export const ArticleFallbackBanner: React.FC<ArticleFallbackBannerProps> = ({
         </div>
 
         {/* Right: Auto-redirection countdown & control */}
-        <div className="flex items-center gap-2 text-[#728984] text-[11px] shrink-0 self-end sm:self-auto">
+        <div className="flex items-center gap-2 text-bodyText text-[11px] shrink-0 self-end sm:self-auto">
           {!autoRedirectPaused ? (
             <div className="flex items-center gap-2">
               <span className="tabular-nums">
-                Auto-redirecting in <strong className="text-[#F1F5F4]">{secondsRemaining}s</strong>
+                Auto-redirecting in <strong className="text-titleText">{secondsRemaining}s</strong>
               </span>
               <button
                 onClick={() => setAutoRedirectPaused(true)}
-                className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-[#F1F5F4] transition-colors cursor-pointer flex items-center gap-1"
+                className="px-2 py-0.5 rounded bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-titleText transition-colors cursor-pointer flex items-center gap-1 border border-borderSubtle"
                 title="Pause auto-redirect"
               >
                 <Pause className="w-2.5 h-2.5" />
@@ -72,14 +72,14 @@ export const ArticleFallbackBanner: React.FC<ArticleFallbackBannerProps> = ({
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2 text-[#728984]">
+            <div className="flex items-center gap-2 text-bodyText">
               <span>Auto-redirect paused</span>
               <button
                 onClick={() => {
                   setSecondsRemaining(autoRedirectSeconds);
                   setAutoRedirectPaused(false);
                 }}
-                className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-[#10B981] transition-colors cursor-pointer flex items-center gap-1"
+                className="px-2 py-0.5 rounded bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-accentGlow transition-colors cursor-pointer flex items-center gap-1 border border-borderSubtle"
                 title="Resume auto-redirect"
               >
                 <Play className="w-2.5 h-2.5" />
@@ -90,7 +90,7 @@ export const ArticleFallbackBanner: React.FC<ArticleFallbackBannerProps> = ({
 
           <button
             onClick={() => setBannerDismissed(true)}
-            className="p-1 text-[#728984] hover:text-[#F1F5F4] rounded transition-colors cursor-pointer ml-1"
+            className="p-1 text-bodyText hover:text-titleText rounded transition-colors cursor-pointer ml-1"
             title="Dismiss notice"
             aria-label="Dismiss"
           >

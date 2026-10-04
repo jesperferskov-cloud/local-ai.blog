@@ -28,6 +28,8 @@ interface MarkdownWorkspaceProps {
   onSyncLocalDB: () => void;
   isSaving: boolean;
   lastSavedText: string;
+  notifySubscribers?: boolean;
+  onNotifySubscribersChange?: (val: boolean) => void;
 }
 
 export const MarkdownWorkspace: React.FC<MarkdownWorkspaceProps> = ({
@@ -36,6 +38,8 @@ export const MarkdownWorkspace: React.FC<MarkdownWorkspaceProps> = ({
   onSyncLocalDB,
   isSaving,
   lastSavedText,
+  notifySubscribers = false,
+  onNotifySubscribersChange,
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [previewMode, setPreviewMode] = useState(false);
@@ -627,6 +631,26 @@ export const MarkdownWorkspace: React.FC<MarkdownWorkspaceProps> = ({
                     <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] shadow-[0_0_6px_#10B981]" />
                     <span>Publish</span>
                   </button>
+                </div>
+
+                {/* Send notifikation til abonnenter toggle / checkbox */}
+                <div className="pt-2">
+                  <label className="flex items-start gap-2.5 p-2.5 rounded-xl bg-[#091614] border border-[rgba(255,255,255,0.06)] hover:border-[#10B981]/40 transition-colors cursor-pointer select-none group">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(notifySubscribers)}
+                      onChange={(e) => onNotifySubscribersChange?.(e.target.checked)}
+                      className="w-4 h-4 mt-0.5 rounded border-[#1e4c41] bg-[#0c1d19] text-[#10B981] focus:ring-0 cursor-pointer accent-[#10B981]"
+                    />
+                    <div className="flex flex-col">
+                      <span className="text-xs text-[#F1F5F4] font-medium leading-tight group-hover:text-white">
+                        Send notifikation til abonnenter
+                      </span>
+                      <span className="text-[10px] text-[#6c8077] leading-tight mt-1 font-mono">
+                        Udsendes automatisk når status er Publish og du klikker Gem
+                      </span>
+                    </div>
+                  </label>
                 </div>
               </div>
 

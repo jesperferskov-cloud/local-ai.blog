@@ -2,6 +2,8 @@ import React from 'react';
 import { ArrowLeft, Plus, Check, Lock, FileText, Sliders } from 'lucide-react';
 import { useSiteSettings } from '../../context/SiteSettingsContext';
 
+export type AdminTab = 'posts' | 'subscribers' | 'settings';
+
 interface AdminTopNavProps {
   onBackToBlog: () => void;
   lastSavedText: string;
@@ -9,8 +11,8 @@ interface AdminTopNavProps {
   onManualSave: () => void;
   onNewPost: () => void;
   onLockConsole?: () => void;
-  activeTab: 'posts' | 'settings';
-  onTabChange: (tab: 'posts' | 'settings') => void;
+  activeTab: AdminTab;
+  onTabChange: (tab: AdminTab) => void;
 }
 
 export const AdminTopNav: React.FC<AdminTopNavProps> = ({
@@ -44,7 +46,7 @@ export const AdminTopNav: React.FC<AdminTopNavProps> = ({
         <span className="text-[#728984]">admin</span>
       </div>
 
-      {/* Center: Primary Tab Switcher [Post Manager] [Websted Indstillinger] */}
+      {/* Center: Primary Tab Switcher [Post Manager] [✉️ Abonnenter] [Websted Indstillinger] */}
       <div className="flex items-center bg-[#0c1d19] p-1 rounded-xl border border-white/5 self-start md:self-center">
         <button
           type="button"
@@ -59,6 +61,22 @@ export const AdminTopNav: React.FC<AdminTopNavProps> = ({
           <FileText className={`w-3.5 h-3.5 ${activeTab === 'posts' ? 'text-[#10B981]' : ''}`} />
           <span>Post Manager</span>
           {activeTab === 'posts' && (
+            <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] shadow-[0_0_6px_#10B981]" />
+          )}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onTabChange('subscribers')}
+          className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all flex items-center gap-1.5 cursor-pointer ${
+            activeTab === 'subscribers'
+              ? 'bg-[#14332c] text-[#F1F5F4] border border-[#1e4c41] shadow-sm font-medium'
+              : 'text-[#728984] hover:text-[#F1F5F4]'
+          }`}
+          aria-pressed={activeTab === 'subscribers'}
+        >
+          <span>✉️ Abonnenter</span>
+          {activeTab === 'subscribers' && (
             <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] shadow-[0_0_6px_#10B981]" />
           )}
         </button>

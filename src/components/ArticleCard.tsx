@@ -46,7 +46,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   return (
     <article
       onClick={() => onRead(article)}
-      className={`group cursor-pointer text-left relative overflow-hidden bg-[#0E1F1C] border border-white/5 hover:border-[#10B981]/25 rounded-2xl transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.01] shadow-lg shadow-black/20 hover:shadow-2xl hover:shadow-black/40 ${
+      className={`group cursor-pointer text-left relative overflow-hidden bg-cardSurface border border-borderSubtle hover:border-accentGlow/30 rounded-2xl transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.01] shadow-[var(--shadow-article-card)] ${
         isCol1
           ? 'flex flex-col md:flex-row md:items-center md:gap-8 p-6 sm:p-8'
           : 'flex flex-col justify-between h-full p-6 sm:p-7'
@@ -56,34 +56,36 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
       <div
         className="absolute -top-16 -right-16 w-56 h-56 rounded-full pointer-events-none opacity-20 group-hover:opacity-40 transition-opacity duration-500 z-0"
         style={{
-          background: 'radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, var(--accent-glow) 0%, transparent 70%)',
         }}
         aria-hidden="true"
       />
 
       {/* Aspect-ratio-locked cover container */}
       <div
-        className={`aspect-[16/10] w-full rounded-xl bg-[#091614] border border-white/5 flex items-center justify-center relative overflow-hidden transition-all duration-300 ease-out group-hover:border-[#10B981]/20 z-10 ${
+        className={`aspect-[16/10] w-full rounded-xl bg-canvas border border-borderSubtle flex items-center justify-center relative overflow-hidden transition-all duration-300 ease-out group-hover:border-accentGlow/30 z-10 ${
           isCol1 ? 'md:w-5/12 lg:w-2/5 shrink-0' : ''
         }`}
         style={{
-          background: 'radial-gradient(120px circle at top right, rgba(16, 185, 129, 0.05), transparent 70%), #091614',
+          background: 'radial-gradient(120px circle at top right, var(--accent-glow), transparent 70%), var(--bg-inner)',
         }}
       >
         {/* The Ambient "JF-Style" Corner Glow behind thumbnail */}
         <div
-          className="absolute inset-0 pointer-events-none z-0"
+          className="absolute inset-0 pointer-events-none z-0 transition-opacity duration-500"
           style={{
-            background: 'radial-gradient(120px circle at top right, rgba(16, 185, 129, 0.05), transparent 70%)',
+            background: 'radial-gradient(120px circle at top right, var(--accent-glow), transparent 70%)',
+            opacity: 'var(--halo-opacity)',
           }}
           aria-hidden="true"
         />
 
-        {/* Soft foggy aura that bleeds through the dark vector lines */}
+        {/* Soft foggy aura that bleeds through the vector lines */}
         <div
           className="absolute -top-6 -right-6 w-32 h-32 rounded-full pointer-events-none opacity-40 group-hover:opacity-75 transition-opacity duration-300 z-0"
           style={{
-            background: 'radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, var(--accent-glow) 0%, transparent 70%)',
+            opacity: 'calc(var(--halo-opacity) * 5)',
           }}
           aria-hidden="true"
         />
@@ -106,7 +108,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
         )}
 
         {/* Hairline subtle corner marker (Zen-Tech emerald dot) with tactile hover glow */}
-        <div className="absolute top-3.5 right-3.5 w-1.5 h-1.5 rounded-full bg-[#10B981] opacity-80 group-hover:opacity-100 group-hover:shadow-[0_0_10px_#10B981] transition-all duration-300 z-10" />
+        <div className="absolute top-3.5 right-3.5 w-1.5 h-1.5 rounded-full bg-accentGlow opacity-80 group-hover:opacity-100 group-hover:shadow-[0_0_10px_var(--accent-glow)] transition-all duration-300 z-10" />
       </div>
 
       {/* Text details container */}
@@ -118,7 +120,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
         <div>
           {/* Bold Editorial Title */}
           <h3
-            className={`font-semibold text-[#F1F5F4] group-hover:text-white transition-colors duration-300 leading-snug text-balance ${
+            className={`font-semibold text-titleText group-hover:text-accentGlow transition-colors duration-300 leading-snug text-balance ${
               isCol1
                 ? 'text-lg sm:text-xl lg:text-2xl mt-0'
                 : 'text-base sm:text-lg'
@@ -129,7 +131,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 
           {/* Short Excerpt */}
           <p
-            className={`text-[#728984] leading-relaxed transition-all duration-300 font-sans ${
+            className={`text-bodyText leading-relaxed transition-all duration-300 font-sans ${
               isCol1
                 ? 'text-sm sm:text-base line-clamp-2 md:line-clamp-3 mt-2 sm:mt-3'
                 : 'text-xs sm:text-sm line-clamp-2 mt-2'
@@ -141,7 +143,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 
         {/* Unified Minimalist Metadata Line Component */}
         <div
-          className={`transition-all duration-300 pt-4 border-t border-white/5 ${
+          className={`transition-all duration-300 pt-4 border-t border-borderSubtle ${
             isCol1 ? 'mt-4 md:mt-6' : 'mt-5'
           }`}
         >

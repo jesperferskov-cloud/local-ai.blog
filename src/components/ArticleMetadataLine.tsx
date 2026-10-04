@@ -101,7 +101,7 @@ export const ArticleMetadataLine: React.FC<ArticleMetadataLineProps> = ({
 
   return (
     <div
-      className={`flex items-center flex-wrap text-xs text-[#728984] font-mono tracking-wide ${className}`}
+      className={`flex items-center flex-wrap text-xs text-bodyText font-mono tracking-wide ${className}`}
     >
       {/* 1. Formatted Date & optional (Opdateret) indicator */}
       {formattedDate && (
@@ -109,7 +109,7 @@ export const ArticleMetadataLine: React.FC<ArticleMetadataLineProps> = ({
           <span>{formattedDate}</span>
           {hasUpdatedBadge && (
             <span
-              className="text-[10px] text-[#8fa49f] font-sans italic opacity-90 select-none"
+              className="text-[10px] text-bodyText font-sans italic opacity-80 select-none"
               title={`Revideret: ${formatArticleDate(rawUpdated, lang)}`}
             >
               {updatedLabel}
@@ -120,7 +120,7 @@ export const ArticleMetadataLine: React.FC<ArticleMetadataLineProps> = ({
 
       {/* Separator 1 */}
       {formattedDate && readingTime && (
-        <span className="text-[#728984] mx-2 select-none" aria-hidden="true">
+        <span className="text-bodyText opacity-60 mx-2 select-none" aria-hidden="true">
           •
         </span>
       )}
@@ -132,7 +132,7 @@ export const ArticleMetadataLine: React.FC<ArticleMetadataLineProps> = ({
 
       {/* Separator 2 */}
       {readingTime && hardwareSpecs && (
-        <span className="text-[#728984] mx-2 select-none" aria-hidden="true">
+        <span className="text-bodyText opacity-60 mx-2 select-none" aria-hidden="true">
           •
         </span>
       )}

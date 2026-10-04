@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { StoredPost, sampleAdminPosts, initialDraftContent } from '../../data/adminSeed';
-import { AdminTopNav } from './AdminTopNav';
+import { AdminTopNav, AdminTab } from './AdminTopNav';
 import { AdminMetrics } from './AdminMetrics';
 import { MarkdownWorkspace } from './MarkdownWorkspace';
 import { ArticleListView } from './ArticleListView';
 import { SiteSettingsWorkspace } from './SiteSettingsWorkspace';
+import { SubscribersWorkspace } from './SubscribersWorkspace';
 import { Database, CheckCircle2 } from 'lucide-react';
 import { useSiteSettings } from '../../context/SiteSettingsContext';
 import { getTodayDateString } from '../../utils/dateUtils';
@@ -18,7 +19,8 @@ const STORAGE_POSTS_KEY = 'localai_blog_admin_posts_v1';
 const STORAGE_CURRENT_KEY = 'localai_blog_current_draft_v1';
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToBlog, onLockConsole }) => {
-  const [activeTab, setActiveTab] = useState<'posts' | 'settings'>('posts');
+  const [activeTab, setActiveTab] = useState<AdminTab>('posts');
+  const [notifySubscribers, setNotifySubscribers] = useState(false);
   const { saveSettings } = useSiteSettings();
 
   // Posts state initialized with 28 posts (5 drafts, 23 published)
@@ -127,7 +129,32 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToBlog, onLockCons
           console.warn('Server sync error, falling back to local storage', syncErr);
         }
 
-        // 2. Update local state and persistent storage
+        // 2. Publish Notification Trigger: If status is 'published' AND notification toggle is checked
+        let notificationNotice = '';
+        if (showFeedback && updatedPost.status === 'published' && notifySubscribers) {
+          try {
+            const notifyRes = await fetch('/api/notify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                title: updatedPost.title,
+                slug: updatedPost.slug,
+              }),
+            });
+            const notifyData = await notifyRes.json();
+            if (notifyRes.ok && notifyData.success) {
+              notificationNotice = ` · Notifikation sendt (${notifyData.count} abonnenter)`;
+              setNotifySubscribers(false);
+            } else {
+              notificationNotice = ` · Notifikationsfejl: ${notifyData.error || 'Ukendt'}`;
+            }
+          } catch (notifyErr: any) {
+            console.error('Mail notification error:', notifyErr);
+            notificationNotice = ` · Fejl ved afsendelse af mail`;
+          }
+        }
+
+        // 3. Update local state and persistent storage
         setPosts((prevPosts) => {
           const updated = prevPosts.map((p) => (p.id === updatedPost.id ? updatedPost : p));
           if (!updated.some((p) => p.id === updatedPost.id)) {
@@ -144,9 +171,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToBlog, onLockCons
 
         if (showFeedback) {
           setToastMessage(
-            `Synkroniseret! /content/posts/${updatedPost.slug}.md`
+            `Synkroniseret! /content/posts/${updatedPost.slug}.md${notificationNotice}`
           );
-          setTimeout(() => setToastMessage(null), 3000);
+          setTimeout(() => setToastMessage(null), 4000);
         }
       } catch (err) {
         console.error('Save failed', err);
@@ -154,7 +181,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToBlog, onLockCons
         setTimeout(() => setIsSaving(false), 300);
       }
     },
-    []
+    [notifySubscribers]
   );
 
   // Auto-save Engine: Every 30 seconds for active post
@@ -289,6 +316,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToBlog, onLockCons
               onSyncLocalDB={() => performSave(currentPost, true)}
               isSaving={isSaving}
               lastSavedText={lastSavedText}
+              notifySubscribers={notifySubscribers}
+              onNotifySubscribersChange={setNotifySubscribers}
             />
 
             {/* 4. Article List View: Simple, minimalist text list below editor */}
@@ -302,6 +331,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToBlog, onLockCons
               onDeletePost={handleDeletePost}
             />
           </>
+        ) : activeTab === 'subscribers' ? (
+          /* Zero-Cloud Local Subscribers Management Tab */
+          <SubscribersWorkspace
+            onNotify={(msg) => {
+              setToastMessage(msg);
+              setTimeout(() => setToastMessage(null), 3000);
+            }}
+          />
         ) : (
           /* Global Site Settings Workspace Tab */
           <SiteSettingsWorkspace

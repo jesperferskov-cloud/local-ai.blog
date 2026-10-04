@@ -8,7 +8,7 @@ import { Article } from './types';
 import { Navbar } from './components/Navbar';
 import { HeroFeatured } from './components/HeroFeatured';
 import { ArticlesSection, ArticleFilterCategory } from './components/ArticlesSection';
-import { AboutSignature } from './components/AboutSignature';
+import { AboutCard } from './components/AboutCard';
 import { Newsletter } from './components/Newsletter';
 import { Footer } from './components/Footer';
 import { ArticleModal } from './components/ArticleModal';
@@ -17,6 +17,7 @@ import { AdminPanel } from './components/admin/AdminPanel';
 import { AdminLockScreen } from './components/admin/AdminLockScreen';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { SiteSettingsProvider } from './context/SiteSettingsContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { hasValidAdminSession, clearAdminSession } from './services/adminAuthService';
 
 function BlogApp() {
@@ -136,24 +137,25 @@ function BlogApp() {
 
   return (
     /* The Eclipse Aura Setup:
-       Outer page background: #161E1D (deep, smoky forest-slate).
-       Soft radial halo: radial-gradient(circle at 50% 30%, rgba(16, 185, 129, 0.03) 0%, transparent 60%).
-       Central floating container with rounded corners (24px), Deep Forest Black (#091614),
-       Mac-style ambient diffused drop shadow, microscopic inner glow, and 1px glowing aluminum border gradient.
+       Outer page background: var(--bg-outer)
+       Soft radial halo: radial-gradient(circle at 50% 30%, var(--accent-glow) 0%, transparent 60%)
+       Central floating container with rounded corners (24px), Canvas background (var(--bg-inner)),
+       Ambient diffused drop shadow, inner glow, and subtle aluminum border.
     */
-    <div className="relative min-h-screen bg-[#161E1D] p-3 sm:p-5 md:p-7 lg:p-10 xl:p-12 flex flex-col items-center justify-start font-sans selection:bg-[#10B981] selection:text-[#091614] overflow-x-hidden">
+    <div className="relative min-h-screen bg-outer p-3 sm:p-5 md:p-7 lg:p-10 xl:p-12 flex flex-col items-center justify-start font-sans selection:bg-accentGlow selection:text-canvas overflow-x-hidden transition-colors duration-500">
       {/* The Eclipse Aura: Soft Ambient Radial Glow Halo */}
       <div
-        className="pointer-events-none fixed inset-0 z-0 animate-aura-pulse"
+        className="pointer-events-none fixed inset-0 z-0 animate-aura-pulse transition-opacity duration-700"
         style={{
-          background: 'radial-gradient(circle at 50% 30%, rgba(16, 185, 129, 0.03) 0%, transparent 60%)',
+          background: 'radial-gradient(circle at 50% 30%, var(--accent-glow) 0%, transparent 60%)',
+          opacity: 'var(--halo-opacity)',
         }}
         aria-hidden="true"
       />
 
-      <div className="relative z-10 w-full max-w-[1360px] bg-[#091614] rounded-[24px] overflow-hidden text-neutral-100 shadow-[0_30px_100px_-10px_rgba(0,0,0,0.6),0_10px_30px_-15px_rgba(0,0,0,0.4),inset_0_1px_0_0_rgba(255,255,255,0.05)] border-t border-white/10 border-x border-white/5 border-b border-transparent flex flex-col">
+      <div className="relative z-10 w-full max-w-[1360px] bg-canvas rounded-[24px] overflow-hidden text-titleText shadow-[var(--shadow-main-container)] border border-borderSubtle transition-all duration-500 flex flex-col">
         
-        {/* Navigation Bar with interactive DA / EN switch */}
+        {/* Navigation Bar with interactive DA / EN switch and Morgengry / Aftengry toggle */}
         <Navbar
           onSelectCategory={(cat) => handleSelectCategory(cat as ArticleFilterCategory)}
           searchOpen={searchOpen}
@@ -182,7 +184,7 @@ function BlogApp() {
           />
 
           {/* "Bag om bloggen" (About Me) Editorial Signature Card */}
-          <AboutSignature id="bag-om-bloggen" />
+          <AboutCard id="bag-om-bloggen" />
 
           {/* Minimalist Newsletter */}
           <Newsletter />
@@ -209,10 +211,12 @@ function BlogApp() {
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <SiteSettingsProvider>
-        <BlogApp />
-      </SiteSettingsProvider>
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <SiteSettingsProvider>
+          <BlogApp />
+        </SiteSettingsProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }
